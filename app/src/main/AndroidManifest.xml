@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.sn1006.atkins.sprint">
 
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION">gpsFineLocation</uses-permission>
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
