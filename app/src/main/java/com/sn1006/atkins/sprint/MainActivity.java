@@ -37,7 +37,6 @@ import com.google.android.gms.location.LocationSettingsStatusCodes;
 
 import java.text.DateFormat;
 import java.util.Date;
-import java.util.Map;
 
 
 public class MainActivity extends FragmentActivity implements
