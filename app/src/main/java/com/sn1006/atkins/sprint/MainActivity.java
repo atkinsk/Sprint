@@ -31,6 +31,10 @@ import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 
+import org.w3c.dom.Text;
+
+import static java.lang.Math.abs;
+
 
 public class MainActivity extends FragmentActivity implements
         OnConnectionFailedListener,
@@ -54,9 +58,9 @@ public class MainActivity extends FragmentActivity implements
     protected boolean mRequestingLocationUpdates;
 
     //Intervals at which the GPS location services will update. Preferred and fastest interval
-    //The values are to be tweaked in the future. Must be low to provide enough precision for lap timing
-    public static final long UPDATE_INTERVAL_IN_MS = 2000;
-    public static final long FASTEST_UPDATE_INTERVAL_IN_MS = 1000;
+    //The values are to be tweaked in the future. Seems minimum update interval is ~1 second
+    public static final long UPDATE_INTERVAL_IN_MS = 750;
+    public static final long FASTEST_UPDATE_INTERVAL_IN_MS = 500;
 
     // Keys for storing activity state in the Bundle.
 //    protected final static String KEY_REQUESTING_LOCATION_UPDATES = "requesting-location-updates";
@@ -64,6 +68,35 @@ public class MainActivity extends FragmentActivity implements
 
     //Request code used for requestPermissions. Must be >=0
     protected final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 23;
+
+    //GPS Location averaging counter and calculation variables
+    protected double mAvgGpsCounter = 0;
+    protected double mBaseLatitude = 0;
+    protected double mBaseLongitude = 0;
+    protected double mCurrentLatitude = 0;
+    protected double mCurrentLongitude = 0;
+    protected double mLatitudeDiff = 0;
+    protected double mLongitudeDiff = 0;
+    protected double mLatitudeSum = 0;
+    protected double mLongitudeSum = 0;
+    protected double mLatitudeAverage = 0;
+    protected double mLongitudeAverage = 0;
+    protected double mLatitudeSumDiff = 0;
+    protected double mLongitudeSumDiff = 0;
+    protected double mLatitudeAvgDiff = 0;
+    protected double mLongitudeAvgDiff = 0;
+    protected double mLatitudeMaxDiff = 0.0;
+    protected double mLongitudeMaxDiff = 0.0;
+
+    protected TextView mLatitudeDiffText;
+    protected TextView mLongitudeDiffText;
+    protected TextView mLatMaxDiffText;
+    protected TextView mLongMaxDiffText;
+    protected TextView mLatAvgDiffText;
+    protected TextView mLongAvgDiffText;
+    protected TextView mLatAvgText;
+    protected TextView mLongAvgText;
+    protected TextView mGpsCounterText;
 
     //Fires when the system first creates the Main Activity
     @Override
@@ -73,6 +106,15 @@ public class MainActivity extends FragmentActivity implements
 
         mLatitudeText = (TextView) findViewById(R.id.latitude);
         mLongitudeText = (TextView) findViewById(R.id.longitude);
+        mLatitudeDiffText = (TextView) findViewById(R.id.latitudeDifference);
+        mLongitudeDiffText = (TextView) findViewById(R.id.longitudeDifference);
+        mLatMaxDiffText = (TextView) findViewById(R.id.latMaxDiff);
+        mLongMaxDiffText = (TextView) findViewById(R.id.LongMaxDiff);
+        mLatAvgDiffText = (TextView) findViewById(R.id.LatAvgDiff);
+        mLongAvgDiffText = (TextView) findViewById(R.id.LongAvgDiff);
+        mLatAvgText = (TextView) findViewById(R.id.AvgLat);
+        mLongAvgText = (TextView) findViewById(R.id.AvgLong);
+        mGpsCounterText = (TextView) findViewById(R.id.gpsCounter);
 
         mRequestingLocationUpdates = false;
 
@@ -150,7 +192,7 @@ public class MainActivity extends FragmentActivity implements
                         try {
                             LocationServices.FusedLocationApi.requestLocationUpdates(
                                     mGoogleApiClient, mLocationRequest, MainActivity.this);
-                        }catch (SecurityException e){
+                        } catch (SecurityException e) {
                             //Tech Debt: Provide better error log message
                             Log.e(TAG, "requestLocationUpdates securityException.");
                         }
@@ -199,6 +241,17 @@ public class MainActivity extends FragmentActivity implements
                     mCurrentLocation.getLatitude()));
             mLongitudeText.setText(String.format("%s: %f", mLongitudeLabel,
                     mCurrentLocation.getLongitude()));
+            locationCoordinateDifference();
+            mLatitudeDiffText.setText(String.format("%s: %f", mLatitudeLabel, mLatitudeDiff));
+            mLongitudeDiffText.setText(String.format("%s: %f", mLongitudeLabel, mLongitudeDiff));
+            mLatMaxDiffText.setText(String.format("%s: %f", mLatitudeLabel, mLatitudeMaxDiff));
+            mLongMaxDiffText.setText(String.format("%s: %f", mLatitudeLabel, mLongitudeMaxDiff));
+            mLatAvgDiffText.setText(String.format("%s: %f", mLatitudeLabel, mLatitudeAvgDiff));
+            mLongAvgDiffText.setText(String.format("%s: %f", mLatitudeLabel, mLongitudeAvgDiff));
+            mLatAvgText.setText((String.format("%s: %f", mLatitudeLabel, mLatitudeAverage)));
+            mLongAvgText.setText(String.format("%s: %f", mLatitudeLabel, mLongitudeAverage));
+            mGpsCounterText.setText(String.format("%s: %f", mLatitudeLabel, mAvgGpsCounter));
+
         }
     }
 
@@ -243,8 +296,6 @@ public class MainActivity extends FragmentActivity implements
         mRequestingLocationUpdates = true;
     }
 
-    //Only set to true after request. So if it gets set to false, it will never get set to true again... will not startLocationUpdates
-
     //When requestPermissions is called on in the permissionCheck method, this method is called automatically to process the user's input
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -263,19 +314,75 @@ public class MainActivity extends FragmentActivity implements
                     return;
                 }
             }
-            // Include any other permission requests required after this point
+            // Include any other permission requests after this point
         }
     }
+
+    public void locationCoordinateDifference() {
+        //Increment counter to ignore initial GPS location
+        if (mAvgGpsCounter <= 10) {
+            mAvgGpsCounter++;
+            return;
+        }
+
+        //On the second GPS coordinate, set the base values for latitude and longitude calculations
+        if (mAvgGpsCounter == 11) {
+            //Pull baseline latitude and longitude from location services
+            mBaseLatitude = mCurrentLocation.getLatitude();
+            mBaseLongitude = mCurrentLocation.getLongitude();
+            //Pull baseline latitude and longitude for average calulation
+            mLatitudeSum += mBaseLatitude;
+            mLongitudeSum += mBaseLongitude;
+
+            mAvgGpsCounter++;
+            return;
+        }
+        //On each subsequent GPS coordinate, calculate the difference to the base
+        if (mAvgGpsCounter > 11) {
+            //Pull current latitude and longitude from location services
+            mCurrentLatitude = mCurrentLocation.getLatitude();
+            mCurrentLongitude = mCurrentLocation.getLongitude();
+
+            //Calculate latitude and longitude differences from baselinepo[/.
+            mLatitudeDiff = mBaseLatitude - mCurrentLatitude;
+            mLongitudeDiff = mBaseLongitude - mCurrentLongitude;
+
+            //Calculation of Average latitude and longitude
+            mLatitudeSum += mCurrentLatitude;
+            mLongitudeSum += mCurrentLongitude;
+            mLatitudeAverage = mLatitudeSum / mAvgGpsCounter;
+            mLongitudeAverage = mLongitudeSum / mAvgGpsCounter;
+
+            //Calculation of Average latitude and longitude differences from initial value
+            mLatitudeSumDiff += mLatitudeDiff;
+            mLongitudeSumDiff += mLongitudeDiff;
+            mLatitudeAvgDiff = mLatitudeSumDiff / mAvgGpsCounter;
+            mLongitudeAvgDiff = mLongitudeSumDiff / mAvgGpsCounter;
+
+            //Determine max deviation from baseline latitude
+            if (abs(mLatitudeMaxDiff) < abs(mLatitudeDiff)) {
+                mLatitudeMaxDiff = mLatitudeDiff;
+            }
+
+            //Determine max deviation from baseline longitude
+            if (abs(mLongitudeMaxDiff) < abs(mLongitudeDiff)) {
+                mLongitudeMaxDiff = mLongitudeDiff;
+            }
+
+            mAvgGpsCounter++;
+            return;
+        }
+    }
+
 
     //Fires when the google play location services is connected
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-
+        permissionCheck();
         if (mCurrentLocation == null) {
-            permissionCheck();
             try {
                 mCurrentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-            }catch (SecurityException e){
+            } catch (SecurityException e) {
                 Log.e(TAG, "getLastLocation securityException.");
             }
             updateLocationUI();
@@ -285,7 +392,6 @@ public class MainActivity extends FragmentActivity implements
             permissionCheck();
             startLocationUpdates();
         }
-
     }
 
     @Override
