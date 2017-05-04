@@ -6,11 +6,13 @@ import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,51 +32,49 @@ import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 
 
-import java.text.DateFormat;
-import java.util.Date;
-
-
 public class MainActivity extends FragmentActivity implements
         OnConnectionFailedListener,
         ConnectionCallbacks,
         LocationListener {
 
     protected GoogleApiClient mGoogleApiClient;
-    protected Location mLastLocation;
     protected String mLatitudeLabel = "x";
     protected String mLongitudeLabel = "y";
     protected TextView mLatitudeText;
     protected TextView mLongitudeText;
     protected static final String TAG = "MainActivity";
     protected Location mCurrentLocation;
-    protected String mLastUpdateTime;
 
     protected LocationRequest mLocationRequest;
     protected LocationSettingsRequest mLocationSettingsRequest;
 
     protected static final int REQUEST_CHECK_SETTINGS = 0x1;
 
+    //Determine whether or not location updates will be completed by the specified intervals
     protected boolean mRequestingLocationUpdates;
 
-    //Update intervals for GPS
+    //Intervals at which the GPS location services will update. Preferred and fastest interval
+    //The values are to be tweaked in the future. Must be low to provide enough precision for lap timing
     public static final long UPDATE_INTERVAL_IN_MS = 2000;
     public static final long FASTEST_UPDATE_INTERVAL_IN_MS = 1000;
 
     // Keys for storing activity state in the Bundle.
 //    protected final static String KEY_REQUESTING_LOCATION_UPDATES = "requesting-location-updates";
     protected final static String KEY_LOCATION = "location";
-//    protected final static String KEY_LAST_UPDATED_TIME_STRING = "last-updated-time-string";
 
+    //Request code used for requestPermissions. Must be >=0
+    protected final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 23;
+
+    //Fires when the system first creates the Main Activity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mLatitudeText = (TextView) findViewById((R.id.latitude));
-        mLongitudeText = (TextView) findViewById((R.id.longitude));
+        mLatitudeText = (TextView) findViewById(R.id.latitude);
+        mLongitudeText = (TextView) findViewById(R.id.longitude);
 
         mRequestingLocationUpdates = false;
-        mLastUpdateTime = "";
 
         updateValuesFromBundle(savedInstanceState);
 
@@ -99,16 +99,12 @@ public class MainActivity extends FragmentActivity implements
                 // is not null.
                 mCurrentLocation = savedInstanceState.getParcelable(KEY_LOCATION);
             }
-
-            // Update the value of mLastUpdateTime from the Bundle and update the UI.
-//            if (savedInstanceState.keySet().contains(KEY_LAST_UPDATED_TIME_STRING)) {
-//                mLastUpdateTime = savedInstanceState.getString(KEY_LAST_UPDATED_TIME_STRING);
 //            }
             updateLocationUI();
         }
     }
 
-    //Method to create instance of Google Api Client connecting it to location services
+    //Creates instance of Google Api Client allowing the app to connect to google location services
     protected synchronized void buildGoogleApiClient() {
         //Confirms no instance of GoogleApiClient has been instantiated
         if (mGoogleApiClient == null) {
@@ -151,18 +147,13 @@ public class MainActivity extends FragmentActivity implements
                 switch (status.getStatusCode()) {
                     case LocationSettingsStatusCodes.SUCCESS:
                         Log.i(TAG, "All location settings are satisfied.");
-                        if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                            // TODO: Consider calling
-                            //    ActivityCompat#requestPermissions
-                            // here to request the missing permissions, and then overriding
-                            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                            //                                          int[] grantResults)
-                            // to handle the case where the user grants the permission. See the documentation
-                            // for ActivityCompat#requestPermissions for more details.
-                            return;
+                        try {
+                            LocationServices.FusedLocationApi.requestLocationUpdates(
+                                    mGoogleApiClient, mLocationRequest, MainActivity.this);
+                        }catch (SecurityException e){
+                            //Tech Debt: Provide better error log message
+                            Log.e(TAG, "requestLocationUpdates securityException.");
                         }
-                        LocationServices.FusedLocationApi.requestLocationUpdates(
-                                mGoogleApiClient, mLocationRequest, MainActivity.this);
                         break;
                     case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
                         Log.i(TAG, "Location settings are not satisfied. Attempting to upgrade " +
@@ -182,6 +173,7 @@ public class MainActivity extends FragmentActivity implements
                         Toast.makeText(MainActivity.this, errorMessage, Toast.LENGTH_LONG).show();
                         mRequestingLocationUpdates = false;
                 }
+                //
                 updateLocationUI();
             }
         });
@@ -194,15 +186,14 @@ public class MainActivity extends FragmentActivity implements
         ).setResultCallback(new ResultCallback<Status>() {
             @Override
             public void onResult(Status status) {
-                mRequestingLocationUpdates = false;
                 // setButtonsEnabledState();
+                mRequestingLocationUpdates = false;
             }
         });
     }
 
-
+    //Sets the UI values for the latitude and longitude
     protected void updateLocationUI() {
-        mRequestingLocationUpdates = true;
         if (mCurrentLocation != null) {
             mLatitudeText.setText(String.format("%s: %f", mLatitudeLabel,
                     mCurrentLocation.getLatitude()));
@@ -211,7 +202,7 @@ public class MainActivity extends FragmentActivity implements
         }
     }
 
-    //Used when checking user location settings
+    //Specification of the priority and update interval for the location request
     protected void createLocationRequest() {
         mLocationRequest = new LocationRequest();
         //Sets the preferred interval for GPS location updates
@@ -230,6 +221,72 @@ public class MainActivity extends FragmentActivity implements
 
     }
 
+    protected void permissionCheck() {
+        if (Build.VERSION.SDK_INT >= 23 && ContextCompat.checkSelfPermission(MainActivity.this,
+                Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(MainActivity.this,
+                        android.Manifest.permission.ACCESS_COARSE_LOCATION)
+                        != PackageManager.PERMISSION_GRANTED) {
+            //If permission has been denied, lets the user know that the app cannot be operated
+            //without the location permissions enabled
+            if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,
+                    Manifest.permission.ACCESS_FINE_LOCATION)) {
+                Toast.makeText(MainActivity.this,
+                        "Location permissions required to operate Sprint", Toast.LENGTH_LONG).show();
+            } else {
+                ActivityCompat.requestPermissions(MainActivity.this,
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                        MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+            }
+        }
+        mRequestingLocationUpdates = true;
+    }
+
+    //Only set to true after request. So if it gets set to false, it will never get set to true again... will not startLocationUpdates
+
+    //When requestPermissions is called on in the permissionCheck method, this method is called automatically to process the user's input
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // permission was granted by the user. Proceed with GPS location check
+                    mRequestingLocationUpdates = true;
+                    return;
+                } else {
+                    // permission denied. Do not proceed with GPS location check
+                    mRequestingLocationUpdates = false;
+                    return;
+                }
+            }
+            // Include any other permission requests required after this point
+        }
+    }
+
+    //Fires when the google play location services is connected
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+
+        if (mCurrentLocation == null) {
+            permissionCheck();
+            try {
+                mCurrentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+            }catch (SecurityException e){
+                Log.e(TAG, "getLastLocation securityException.");
+            }
+            updateLocationUI();
+        }
+        if (mRequestingLocationUpdates) {
+            Log.i(TAG, "in onConnected(), starting location updates");
+            permissionCheck();
+            startLocationUpdates();
+        }
+
+    }
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
@@ -246,7 +303,6 @@ public class MainActivity extends FragmentActivity implements
     @Override
     public void onLocationChanged(Location location) {
         mCurrentLocation = location;
-        mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
         updateLocationUI();
     }
 
@@ -278,35 +334,9 @@ public class MainActivity extends FragmentActivity implements
     @Override
     protected void onPause() {
         super.onPause();
-//        if (mGoogleApiClient.isConnected()) {
-//            // stopLocationUpdates();
-//        }
-    }
-
-    @Override
-    public void onConnected(@Nullable Bundle bundle) {
-
-        if (mCurrentLocation == null) {
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
-                return;
-            }
-            mCurrentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-            mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
-            updateLocationUI();
+        if (mGoogleApiClient.isConnected()) {
+            stopLocationUpdates();
         }
-        if (mRequestingLocationUpdates) {
-            Log.i(TAG, "in onConnected(), starting location updates");
-            startLocationUpdates();
-        }
-
     }
-
 }
 
