@@ -48,6 +48,7 @@ public class MainActivity extends FragmentActivity implements
     protected TextView mLongitudeText;
     protected static final String TAG = "MainActivity";
     protected Location mCurrentLocation;
+    protected Location mPreviousLocation;
 
     protected LocationRequest mLocationRequest;
     protected LocationSettingsRequest mLocationSettingsRequest;
@@ -59,8 +60,8 @@ public class MainActivity extends FragmentActivity implements
 
     //Intervals at which the GPS location services will update. Preferred and fastest interval
     //The values are to be tweaked in the future. Seems minimum update interval is ~1 second
-    public static final long UPDATE_INTERVAL_IN_MS = 750;
-    public static final long FASTEST_UPDATE_INTERVAL_IN_MS = 500;
+    public static final long UPDATE_INTERVAL_IN_MS = 750; //750
+    public static final long FASTEST_UPDATE_INTERVAL_IN_MS = 500; //500
 
     // Keys for storing activity state in the Bundle.
 //    protected final static String KEY_REQUESTING_LOCATION_UPDATES = "requesting-location-updates";
@@ -85,8 +86,8 @@ public class MainActivity extends FragmentActivity implements
     protected double mLongitudeSumDiff = 0;
     protected double mLatitudeAvgDiff = 0;
     protected double mLongitudeAvgDiff = 0;
-    protected double mLatitudeMaxDiff = 0.0;
-    protected double mLongitudeMaxDiff = 0.0;
+    protected double mLatitudeMaxDiff = 0;
+    protected double mLongitudeMaxDiff = 0;
 
     protected TextView mLatitudeDiffText;
     protected TextView mLongitudeDiffText;
@@ -97,6 +98,10 @@ public class MainActivity extends FragmentActivity implements
     protected TextView mLatAvgText;
     protected TextView mLongAvgText;
     protected TextView mGpsCounterText;
+
+    protected DistanceCalc distanceCalc = new DistanceCalc();
+    protected double mDistanceTravelled;
+    protected TextView mDistanceTravelledText;
 
     //Fires when the system first creates the Main Activity
     @Override
@@ -115,6 +120,7 @@ public class MainActivity extends FragmentActivity implements
         mLatAvgText = (TextView) findViewById(R.id.AvgLat);
         mLongAvgText = (TextView) findViewById(R.id.AvgLong);
         mGpsCounterText = (TextView) findViewById(R.id.gpsCounter);
+        mDistanceTravelledText = (TextView) findViewById(R.id.distTravelled);
 
         mRequestingLocationUpdates = false;
 
@@ -215,7 +221,6 @@ public class MainActivity extends FragmentActivity implements
                         Toast.makeText(MainActivity.this, errorMessage, Toast.LENGTH_LONG).show();
                         mRequestingLocationUpdates = false;
                 }
-                //
                 updateLocationUI();
             }
         });
@@ -241,7 +246,9 @@ public class MainActivity extends FragmentActivity implements
                     mCurrentLocation.getLatitude()));
             mLongitudeText.setText(String.format("%s: %f", mLongitudeLabel,
                     mCurrentLocation.getLongitude()));
+
             locationCoordinateDifference();
+
             mLatitudeDiffText.setText(String.format("%s: %f", mLatitudeLabel, mLatitudeDiff));
             mLongitudeDiffText.setText(String.format("%s: %f", mLongitudeLabel, mLongitudeDiff));
             mLatMaxDiffText.setText(String.format("%s: %f", mLatitudeLabel, mLatitudeMaxDiff));
@@ -251,7 +258,7 @@ public class MainActivity extends FragmentActivity implements
             mLatAvgText.setText((String.format("%s: %f", mLatitudeLabel, mLatitudeAverage)));
             mLongAvgText.setText(String.format("%s: %f", mLatitudeLabel, mLongitudeAverage));
             mGpsCounterText.setText(String.format("%s: %f", mLatitudeLabel, mAvgGpsCounter));
-
+            mDistanceTravelledText.setText(String.format("%s: %f", "dist", mDistanceTravelled));
         }
     }
 
@@ -389,6 +396,7 @@ public class MainActivity extends FragmentActivity implements
         }
         if (mRequestingLocationUpdates) {
             Log.i(TAG, "in onConnected(), starting location updates");
+            //is this second permissionCheck necessary? Investigate
             permissionCheck();
             startLocationUpdates();
         }
@@ -408,7 +416,16 @@ public class MainActivity extends FragmentActivity implements
 
     @Override
     public void onLocationChanged(Location location) {
+        //When at least one instance of the GPS coordinates exist, set the previous location
+        //This will allow for distance calculations between the last and current gps coordinates
+        if(mAvgGpsCounter > 1){
+            mPreviousLocation = mCurrentLocation;
+        }
         mCurrentLocation = location;
+        //We should place this method call in a more appropriate place... Ideas?
+        if(mAvgGpsCounter > 2){
+            mDistanceTravelled = distanceCalc.coordinatesToDistance(mCurrentLocation,mPreviousLocation);
+        }
         updateLocationUI();
     }
 
