@@ -33,6 +33,8 @@ import com.google.android.gms.location.LocationSettingsStatusCodes;
 
 import org.w3c.dom.Text;
 
+import java.util.Locale;
+
 import static java.lang.Math.abs;
 
 
@@ -190,7 +192,7 @@ public class MainActivity extends FragmentActivity implements
                 mLocationSettingsRequest
         ).setResultCallback(new ResultCallback<LocationSettingsResult>() {
             @Override
-            public void onResult(LocationSettingsResult locationSettingsResult) {
+            public void onResult(@NonNull LocationSettingsResult locationSettingsResult) {
                 final Status status = locationSettingsResult.getStatus();
                 switch (status.getStatusCode()) {
                     case LocationSettingsStatusCodes.SUCCESS:
@@ -232,8 +234,7 @@ public class MainActivity extends FragmentActivity implements
                 this
         ).setResultCallback(new ResultCallback<Status>() {
             @Override
-            public void onResult(Status status) {
-                // setButtonsEnabledState();
+            public void onResult(@NonNull Status status) {
                 mRequestingLocationUpdates = false;
             }
         });
@@ -242,23 +243,21 @@ public class MainActivity extends FragmentActivity implements
     //Sets the UI values for the latitude and longitude
     protected void updateLocationUI() {
         if (mCurrentLocation != null) {
-            mLatitudeText.setText(String.format("%s: %f", mLatitudeLabel,
+            mLatitudeText.setText(String.format(Locale.getDefault(), mLatitudeLabel,
                     mCurrentLocation.getLatitude()));
-            mLongitudeText.setText(String.format("%s: %f", mLongitudeLabel,
+            mLongitudeText.setText(String.format(Locale.getDefault(), mLongitudeLabel,
                     mCurrentLocation.getLongitude()));
 
-            locationCoordinateDifference();
-
-            mLatitudeDiffText.setText(String.format("%s: %f", mLatitudeLabel, mLatitudeDiff));
-            mLongitudeDiffText.setText(String.format("%s: %f", mLongitudeLabel, mLongitudeDiff));
-            mLatMaxDiffText.setText(String.format("%s: %f", mLatitudeLabel, mLatitudeMaxDiff));
-            mLongMaxDiffText.setText(String.format("%s: %f", mLatitudeLabel, mLongitudeMaxDiff));
-            mLatAvgDiffText.setText(String.format("%s: %f", mLatitudeLabel, mLatitudeAvgDiff));
-            mLongAvgDiffText.setText(String.format("%s: %f", mLatitudeLabel, mLongitudeAvgDiff));
-            mLatAvgText.setText((String.format("%s: %f", mLatitudeLabel, mLatitudeAverage)));
-            mLongAvgText.setText(String.format("%s: %f", mLatitudeLabel, mLongitudeAverage));
-            mGpsCounterText.setText(String.format("%s: %f", mLatitudeLabel, mAvgGpsCounter));
-            mDistanceTravelledText.setText(String.format("%s: %f", "dist", mDistanceTravelled));
+            mLatitudeDiffText.setText(String.format(Locale.getDefault(), mLatitudeLabel, mLatitudeDiff));
+            mLongitudeDiffText.setText(String.format(Locale.getDefault(), mLongitudeLabel, mLongitudeDiff));
+            mLatMaxDiffText.setText(String.format(Locale.getDefault(), mLatitudeLabel, mLatitudeMaxDiff));
+            mLongMaxDiffText.setText(String.format(Locale.getDefault(), mLatitudeLabel, mLongitudeMaxDiff));
+            mLatAvgDiffText.setText(String.format(Locale.getDefault(), mLatitudeLabel, mLatitudeAvgDiff));
+            mLongAvgDiffText.setText(String.format(Locale.getDefault(), mLatitudeLabel, mLongitudeAvgDiff));
+            mLatAvgText.setText((String.format(Locale.getDefault(), mLatitudeLabel, mLatitudeAverage)));
+            mLongAvgText.setText(String.format(Locale.getDefault(), mLatitudeLabel, mLongitudeAverage));
+            mGpsCounterText.setText(String.format(Locale.getDefault(), mLatitudeLabel, mAvgGpsCounter));
+            mDistanceTravelledText.setText(String.format(Locale.getDefault(), mLatitudeLabel, mDistanceTravelled));
         }
     }
 
@@ -314,11 +313,9 @@ public class MainActivity extends FragmentActivity implements
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // permission was granted by the user. Proceed with GPS location check
                     mRequestingLocationUpdates = true;
-                    return;
                 } else {
                     // permission denied. Do not proceed with GPS location check
                     mRequestingLocationUpdates = false;
-                    return;
                 }
             }
             // Include any other permission requests after this point
@@ -332,7 +329,7 @@ public class MainActivity extends FragmentActivity implements
             return;
         }
 
-        //On the second GPS coordinate, set the base values for latitude and longitude calculations
+        //On the eleventh GPS coordinate, set the base values for latitude and longitude calculations
         if (mAvgGpsCounter == 11) {
             //Pull baseline latitude and longitude from location services
             mBaseLatitude = mCurrentLocation.getLatitude();
@@ -357,14 +354,14 @@ public class MainActivity extends FragmentActivity implements
             //Calculation of Average latitude and longitude
             mLatitudeSum += mCurrentLatitude;
             mLongitudeSum += mCurrentLongitude;
-            mLatitudeAverage = mLatitudeSum / mAvgGpsCounter;
-            mLongitudeAverage = mLongitudeSum / mAvgGpsCounter;
+            mLatitudeAverage = mLatitudeSum / (mAvgGpsCounter-10);
+            mLongitudeAverage = mLongitudeSum / (mAvgGpsCounter-10);
 
             //Calculation of Average latitude and longitude differences from initial value
             mLatitudeSumDiff += mLatitudeDiff;
             mLongitudeSumDiff += mLongitudeDiff;
-            mLatitudeAvgDiff = mLatitudeSumDiff / mAvgGpsCounter;
-            mLongitudeAvgDiff = mLongitudeSumDiff / mAvgGpsCounter;
+            mLatitudeAvgDiff = mLatitudeSumDiff / (mAvgGpsCounter-10);
+            mLongitudeAvgDiff = mLongitudeSumDiff / (mAvgGpsCounter-10);
 
             //Determine max deviation from baseline latitude
             if (abs(mLatitudeMaxDiff) < abs(mLatitudeDiff)) {
@@ -377,7 +374,6 @@ public class MainActivity extends FragmentActivity implements
             }
 
             mAvgGpsCounter++;
-            return;
         }
     }
 
@@ -426,6 +422,7 @@ public class MainActivity extends FragmentActivity implements
         if(mAvgGpsCounter > 2){
             mDistanceTravelled = distanceCalc.coordinatesToDistance(mCurrentLocation,mPreviousLocation);
         }
+        locationCoordinateDifference();
         updateLocationUI();
     }
 
