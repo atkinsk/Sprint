@@ -101,6 +101,7 @@ public class MainActivity extends FragmentActivity implements
     protected TextView mLongAvgText;
     protected TextView mGpsCounterText;
     protected TextView mZoneStatusText;
+    protected TextView mTimerText;
     protected TextView mBearingToWaypointText;
 
     protected DistanceCalc distanceCalc = new DistanceCalc();
@@ -109,6 +110,9 @@ public class MainActivity extends FragmentActivity implements
     protected TextView mDistanceTravelledText;
     Location mWaypoint = new Location("waypoint");
     protected TextView mDistanceFromWaypointText;
+
+    //timer
+    Timer t = new Timer();
 
     //Fires when the system first creates the Main Activity
     @Override
@@ -130,7 +134,12 @@ public class MainActivity extends FragmentActivity implements
         mDistanceTravelledText = (TextView) findViewById(R.id.distTravelled);
         mDistanceFromWaypointText = (TextView) findViewById(R.id.distWaypoint);
         mZoneStatusText = (TextView) findViewById(R.id.zoneStatus);
+        mTimerText = (TextView) findViewById(R.id.timer);
         mBearingToWaypointText = (TextView) findViewById(R.id.bearingToWaypoint);
+      
+      
+        //testing Timer
+        t.start();
 
         mRequestingLocationUpdates = false;
 
@@ -277,6 +286,8 @@ public class MainActivity extends FragmentActivity implements
             mGpsCounterText.setText(String.format("%s: %f", mLatitudeLabel, mAvgGpsCounter));
             mDistanceTravelledText.setText(String.format("%s: %f", mLatitudeLabel, mDistanceTravelled));
             mDistanceFromWaypointText.setText(String.format("%s: %f", mLatitudeLabel, mDistanceFromWaypoint));
+            mZoneStatusText.setText("IN THE ZONE? " + isInZone);
+            mTimerText.setText(t.getElapsedTime());
             mZoneStatusText.setText("IN THE ZONE? " + mIsInZone);
             mBearingToWaypointText.setText("Bearing to WP: " + mWaypointBearing);
         }
