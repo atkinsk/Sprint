@@ -22,6 +22,10 @@ public class Timer {
         this.running = false;
     }
 
+    public boolean getRunning(){
+        return this.running;
+    }
+
     //return a string with the elapsed time in format of mins:seconds:millis
     public String getElapsedTime() {
 
@@ -39,8 +43,9 @@ public class Timer {
 
         mins = (int) (elapsed/60000);
         secs = (int) (elapsed - mins*60000)/1000;
-        millis = (int) (elapsed - mins*60000 - secs*60000000);
+        millis = (int) (elapsed - mins*60000 - secs*1000);
 
-        return ("Time: " + mins + ":" + secs + ":" + millis);
+        return ("Time: " + String.format("%02d",mins) + ":" + String.format("%02d",secs) + ":"
+                + String.format("%02d",millis));
     }
 }

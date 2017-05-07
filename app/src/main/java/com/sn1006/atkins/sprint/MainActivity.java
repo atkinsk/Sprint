@@ -90,6 +90,7 @@ public class MainActivity extends FragmentActivity implements
     protected double mZoneSize = 15.0; //meters
     protected boolean mIsInZone = false;
     protected double mWaypointBearing = 0.0; //degrees
+    protected boolean mHasLeftZone = false;
 
     protected TextView mLatitudeDiffText;
     protected TextView mLongitudeDiffText;
@@ -136,10 +137,6 @@ public class MainActivity extends FragmentActivity implements
         mZoneStatusText = (TextView) findViewById(R.id.zoneStatus);
         mTimerText = (TextView) findViewById(R.id.timer);
         mBearingToWaypointText = (TextView) findViewById(R.id.bearingToWaypoint);
-      
-      
-        //testing Timer
-        t.start();
 
         mRequestingLocationUpdates = false;
 
@@ -286,10 +283,9 @@ public class MainActivity extends FragmentActivity implements
             mGpsCounterText.setText(String.format("%s: %f", mLatitudeLabel, mAvgGpsCounter));
             mDistanceTravelledText.setText(String.format("%s: %f", mLatitudeLabel, mDistanceTravelled));
             mDistanceFromWaypointText.setText(String.format("%s: %f", mLatitudeLabel, mDistanceFromWaypoint));
-            mZoneStatusText.setText("IN THE ZONE? " + isInZone);
-            mTimerText.setText(t.getElapsedTime());
             mZoneStatusText.setText("IN THE ZONE? " + mIsInZone);
             mBearingToWaypointText.setText("Bearing to WP: " + mWaypointBearing);
+            mTimerText.setText(t.getElapsedTime());
         }
     }
 
@@ -452,10 +448,23 @@ public class MainActivity extends FragmentActivity implements
         mDistanceFromWaypoint = mCurrentLocation.distanceTo(mWaypoint);
 
         if (mDistanceFromWaypoint < mZoneSize) {
+            //we are in the zone
             mIsInZone = true;
             mWaypointBearing = distanceCalc.getDegreesToWaypoint(mCurrentLocation, mWaypoint);
+
+            if(!t.getRunning()){
+                t.start();
+            }
+
+            if(t.getRunning() && mHasLeftZone){
+                t.stop();
+                mHasLeftZone = false;
+                //timer will be reset here, and first lap saved
+            }
+
         } else {
             mIsInZone = false;
+            mHasLeftZone = true;
         }
 
         locationCoordinateDifference();
