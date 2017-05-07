@@ -31,10 +31,6 @@ import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 
-import org.w3c.dom.Text;
-
-import java.util.Locale;
-
 import static java.lang.Math.abs;
 
 
@@ -90,6 +86,9 @@ public class MainActivity extends FragmentActivity implements
     protected double mLongitudeAvgDiff = 0;
     protected double mLatitudeMaxDiff = 0;
     protected double mLongitudeMaxDiff = 0;
+    //set size of zone for testing waypoint arrival/departure
+    protected double zoneSize = 5.0;
+    protected boolean isInZone = false;
 
     protected TextView mLatitudeDiffText;
     protected TextView mLongitudeDiffText;
@@ -100,10 +99,14 @@ public class MainActivity extends FragmentActivity implements
     protected TextView mLatAvgText;
     protected TextView mLongAvgText;
     protected TextView mGpsCounterText;
+    protected TextView mZoneStatusText;
 
     protected DistanceCalc distanceCalc = new DistanceCalc();
     protected double mDistanceTravelled;
+    protected double mDistanceFromWaypoint;
     protected TextView mDistanceTravelledText;
+    Location mWaypoint = new Location("waypoint");
+    protected TextView mDistanceFromWaypointText;
 
     //Fires when the system first creates the Main Activity
     @Override
@@ -123,20 +126,22 @@ public class MainActivity extends FragmentActivity implements
         mLongAvgText = (TextView) findViewById(R.id.AvgLong);
         mGpsCounterText = (TextView) findViewById(R.id.gpsCounter);
         mDistanceTravelledText = (TextView) findViewById(R.id.distTravelled);
+        mDistanceFromWaypointText = (TextView) findViewById(R.id.distWaypoint);
+        mZoneStatusText = (TextView) findViewById(R.id.zoneStatus);
 
         mRequestingLocationUpdates = false;
 
         updateValuesFromBundle(savedInstanceState);
 
         //pre-defined waypoint x and y coords for testing
-        double kevX = 45.293790;
-        double kevY = -75.856926;
-        double jonX = 37.4220;
-        double jonY = -122.0840;
+        double kevX = 45.293531;
+        double kevY = -75.856726;
+        //double jonX = 37.4220;
+        //double jonY = -122.0840;
 
-        //create waypoint object for start/stop point
-        Waypoint kevHouse = new Waypoint(kevX, kevY, "Kevin's House Testing");
-//        Waypoint jonHouse = new Waypoint(jonX,jonY, "Jonathan's House Testing");
+        //create Location object for start/stop point
+        mWaypoint.setLatitude(kevX);
+        mWaypoint.setLongitude(kevY);
 
         buildGoogleApiClient();
         createLocationRequest();
@@ -253,21 +258,23 @@ public class MainActivity extends FragmentActivity implements
     //Sets the UI values for the latitude and longitude
     protected void updateLocationUI() {
         if (mCurrentLocation != null) {
-            mLatitudeText.setText(String.format(Locale.getDefault(), mLatitudeLabel,
+            mLatitudeText.setText(String.format("%s: %f", mLatitudeLabel,
                     mCurrentLocation.getLatitude()));
-            mLongitudeText.setText(String.format(Locale.getDefault(), mLongitudeLabel,
+            mLongitudeText.setText(String.format("%s: %f", mLongitudeLabel,
                     mCurrentLocation.getLongitude()));
 
-            mLatitudeDiffText.setText(String.format(Locale.getDefault(), mLatitudeLabel, mLatitudeDiff));
-            mLongitudeDiffText.setText(String.format(Locale.getDefault(), mLongitudeLabel, mLongitudeDiff));
-            mLatMaxDiffText.setText(String.format(Locale.getDefault(), mLatitudeLabel, mLatitudeMaxDiff));
-            mLongMaxDiffText.setText(String.format(Locale.getDefault(), mLatitudeLabel, mLongitudeMaxDiff));
-            mLatAvgDiffText.setText(String.format(Locale.getDefault(), mLatitudeLabel, mLatitudeAvgDiff));
-            mLongAvgDiffText.setText(String.format(Locale.getDefault(), mLatitudeLabel, mLongitudeAvgDiff));
-            mLatAvgText.setText((String.format(Locale.getDefault(), mLatitudeLabel, mLatitudeAverage)));
-            mLongAvgText.setText(String.format(Locale.getDefault(), mLatitudeLabel, mLongitudeAverage));
-            mGpsCounterText.setText(String.format(Locale.getDefault(), mLatitudeLabel, mAvgGpsCounter));
-            mDistanceTravelledText.setText(String.format(Locale.getDefault(), mLatitudeLabel, mDistanceTravelled));
+            mLatitudeDiffText.setText(String.format("%s: %f", mLatitudeLabel, mLatitudeDiff));
+            mLongitudeDiffText.setText(String.format("%s: %f", mLongitudeLabel, mLongitudeDiff));
+            mLatMaxDiffText.setText(String.format("%s: %f", mLatitudeLabel, mLatitudeMaxDiff));
+            mLongMaxDiffText.setText(String.format("%s: %f", mLatitudeLabel, mLongitudeMaxDiff));
+            mLatAvgDiffText.setText(String.format("%s: %f", mLatitudeLabel, mLatitudeAvgDiff));
+            mLongAvgDiffText.setText(String.format("%s: %f", mLatitudeLabel, mLongitudeAvgDiff));
+            mLatAvgText.setText((String.format("%s: %f", mLatitudeLabel, mLatitudeAverage)));
+            mLongAvgText.setText(String.format("%s: %f", mLatitudeLabel, mLongitudeAverage));
+            mGpsCounterText.setText(String.format("%s: %f", mLatitudeLabel, mAvgGpsCounter));
+            mDistanceTravelledText.setText(String.format("%s: %f", mLatitudeLabel, mDistanceTravelled));
+            mDistanceFromWaypointText.setText(String.format("%s: %f", mLatitudeLabel, mDistanceFromWaypoint));
+            mZoneStatusText.setText("IN THE ZONE? " + isInZone);
         }
     }
 
@@ -364,14 +371,14 @@ public class MainActivity extends FragmentActivity implements
             //Calculation of Average latitude and longitude
             mLatitudeSum += mCurrentLatitude;
             mLongitudeSum += mCurrentLongitude;
-            mLatitudeAverage = mLatitudeSum / (mAvgGpsCounter-10);
-            mLongitudeAverage = mLongitudeSum / (mAvgGpsCounter-10);
+            mLatitudeAverage = mLatitudeSum / (mAvgGpsCounter - 10);
+            mLongitudeAverage = mLongitudeSum / (mAvgGpsCounter - 10);
 
             //Calculation of Average latitude and longitude differences from initial value
             mLatitudeSumDiff += mLatitudeDiff;
             mLongitudeSumDiff += mLongitudeDiff;
-            mLatitudeAvgDiff = mLatitudeSumDiff / (mAvgGpsCounter-10);
-            mLongitudeAvgDiff = mLongitudeSumDiff / (mAvgGpsCounter-10);
+            mLatitudeAvgDiff = mLatitudeSumDiff / (mAvgGpsCounter - 10);
+            mLongitudeAvgDiff = mLongitudeSumDiff / (mAvgGpsCounter - 10);
 
             //Determine max deviation from baseline latitude
             if (abs(mLatitudeMaxDiff) < abs(mLatitudeDiff)) {
@@ -424,14 +431,14 @@ public class MainActivity extends FragmentActivity implements
     public void onLocationChanged(Location location) {
         //When at least one instance of the GPS coordinates exist, set the previous location
         //This will allow for distance calculations between the last and current gps coordinates
-        if(mAvgGpsCounter > 1){
-            mPreviousLocation = mCurrentLocation;
-        }
+        mPreviousLocation = mCurrentLocation;
         mCurrentLocation = location;
-        //We should place this method call in a more appropriate place... Ideas?
-        if(mAvgGpsCounter > 2){
-            mDistanceTravelled = distanceCalc.coordinatesToDistance(mCurrentLocation,mPreviousLocation);
-        }
+        mDistanceTravelled = mCurrentLocation.distanceTo(mPreviousLocation);
+        mDistanceFromWaypoint = mCurrentLocation.distanceTo(mWaypoint);
+
+        if(mDistanceFromWaypoint < zoneSize) { isInZone = true; }
+        else { isInZone = false; }
+
         locationCoordinateDifference();
         updateLocationUI();
     }
