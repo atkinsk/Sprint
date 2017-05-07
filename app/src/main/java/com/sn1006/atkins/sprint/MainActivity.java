@@ -129,9 +129,12 @@ public class MainActivity extends FragmentActivity implements
         //pre-defined waypoint x and y coords for testing
         double kevX = 45.293790;
         double kevY = -75.856926;
+        double jonX = 37.4220;
+        double jonY = -122.0840;
 
         //create waypoint object for start/stop point
-        Waypoint kevHouse = new Waypoint(kevX, kevY, "Kevin's House Circuit");
+        Waypoint kevHouse = new Waypoint(kevX, kevY, "Kevin's House Testing");
+//        Waypoint jonHouse = new Waypoint(jonX,jonY, "Jonathan's House Testing");
 
         buildGoogleApiClient();
         createLocationRequest();
