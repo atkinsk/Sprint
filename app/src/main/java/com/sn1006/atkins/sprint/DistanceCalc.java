@@ -7,20 +7,23 @@ import static java.lang.Math.*;
 
 /**
  * Created by Atkins on 5/6/2017.
+ * This class is responsible for converting the current and previous GPS coordinates of the user
+ * and converting it to a distance as the crow flies(in meters)
  */
-
-public class DistanceCalc {
+//There is no access level (i.e. public) as the default is package-private which makes it so this
+    //class is only visible within the package
+class DistanceCalc {
     private static double radiusOfEarth =6371000; //meters
-    private double currentLatitude;
-    private double currentLongitude;
-    private double previousLatitude;
-    private double previousLongitude;
+    private double currentLatitude; //degrees, current GPS coordinate (latitude)
+    private double currentLongitude; //degrees, current GPS coordinate (longitude)
+    private double previousLatitude; //degrees, last GPS coordinate (latitude)
+    private double previousLongitude; //degrees, last GPS coordinate (longitude)
     private double a; //Haversine Formula, circular distance between two points on a sphere
     private double c; //Angular Distance, in radians
-    private double distanceTravelled;
+    private double distanceTravelled; //meters
 
-
-    public DistanceCalc (){
+    //See comment about access level modifier for the class
+    DistanceCalc (){
         distanceTravelled = 0.0; //meters
         currentLatitude = 0.0; //radians
         currentLongitude = 0.0; //radians
@@ -29,7 +32,8 @@ public class DistanceCalc {
 
     }
 
-    public double coordinatesToDistance (Location currentLocation, Location previousLocation){
+    //See comment about access level modifier for the class
+    double coordinatesToDistance (Location currentLocation, Location previousLocation){
         //Converts current and previous gps coordinates from degrees to radians
         currentLatitude = toRadians(currentLocation.getLatitude());
         currentLongitude = toRadians(currentLocation.getLongitude());
@@ -37,8 +41,8 @@ public class DistanceCalc {
         previousLongitude = toRadians(previousLocation.getLongitude());
 
 
-        //Calculates the Haversine Formula to determine the ciruclar distance between two points
-        //on a sphere
+        //Calculates the Haversine Formula to determine the ciruclar distance between two points on a sphere
+        //Did not use Math.pow as doing x * x multiplication yields better performance
         a = (sin(currentLatitude - previousLatitude) * sin(currentLatitude - previousLatitude))
                 + (cos(currentLatitude) * cos(previousLatitude)
                 * sin(currentLongitude - previousLongitude) * sin(currentLongitude - previousLongitude));
