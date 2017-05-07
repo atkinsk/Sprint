@@ -149,4 +149,14 @@
         app:layout_constraintLeft_toLeftOf="parent"
         android:textSize="20dp" />
 
+    <TextView
+        android:id="@+id/bearingToWaypoint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="bearingToWaypoint"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@+id/zoneStatus"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintLeft_toLeftOf="parent" />
+
 </android.support.constraint.ConstraintLayout>
