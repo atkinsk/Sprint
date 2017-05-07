@@ -87,8 +87,9 @@ public class MainActivity extends FragmentActivity implements
     protected double mLatitudeMaxDiff = 0;
     protected double mLongitudeMaxDiff = 0;
     //set size of zone for testing waypoint arrival/departure
-    protected double zoneSize = 5.0;
-    protected boolean isInZone = false;
+    protected double mZoneSize = 15.0; //meters
+    protected boolean mIsInZone = false;
+    protected double mWaypointBearing = 0.0; //degrees
 
     protected TextView mLatitudeDiffText;
     protected TextView mLongitudeDiffText;
@@ -101,6 +102,7 @@ public class MainActivity extends FragmentActivity implements
     protected TextView mGpsCounterText;
     protected TextView mZoneStatusText;
     protected TextView mTimerText;
+    protected TextView mBearingToWaypointText;
 
     protected DistanceCalc distanceCalc = new DistanceCalc();
     protected double mDistanceTravelled;
@@ -133,7 +135,9 @@ public class MainActivity extends FragmentActivity implements
         mDistanceFromWaypointText = (TextView) findViewById(R.id.distWaypoint);
         mZoneStatusText = (TextView) findViewById(R.id.zoneStatus);
         mTimerText = (TextView) findViewById(R.id.timer);
-
+        mBearingToWaypointText = (TextView) findViewById(R.id.bearingToWaypoint);
+      
+      
         //testing Timer
         t.start();
 
@@ -284,7 +288,8 @@ public class MainActivity extends FragmentActivity implements
             mDistanceFromWaypointText.setText(String.format("%s: %f", mLatitudeLabel, mDistanceFromWaypoint));
             mZoneStatusText.setText("IN THE ZONE? " + isInZone);
             mTimerText.setText(t.getElapsedTime());
-
+            mZoneStatusText.setText("IN THE ZONE? " + mIsInZone);
+            mBearingToWaypointText.setText("Bearing to WP: " + mWaypointBearing);
         }
     }
 
@@ -446,8 +451,12 @@ public class MainActivity extends FragmentActivity implements
         mDistanceTravelled = mCurrentLocation.distanceTo(mPreviousLocation);
         mDistanceFromWaypoint = mCurrentLocation.distanceTo(mWaypoint);
 
-        if(mDistanceFromWaypoint < zoneSize) { isInZone = true; }
-        else { isInZone = false; }
+        if (mDistanceFromWaypoint < mZoneSize) {
+            mIsInZone = true;
+            mWaypointBearing = distanceCalc.getDegreesToWaypoint(mCurrentLocation, mWaypoint);
+        } else {
+            mIsInZone = false;
+        }
 
         locationCoordinateDifference();
         updateLocationUI();
