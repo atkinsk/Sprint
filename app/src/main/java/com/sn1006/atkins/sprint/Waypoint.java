@@ -17,21 +17,21 @@ package com.sn1006.atkins.sprint;
 
 public class Waypoint {
 
-    public int xCoord;
-    public int yCoord;
+    public double xCoord;
+    public double yCoord;
     public String name;
 
-    public Waypoint(int initXCoord, int initYCoord, String initName) {
+    public Waypoint(double initXCoord, double initYCoord, String initName) {
         xCoord = initXCoord;
         yCoord = initYCoord;
         name = initName;
     }
 
-    public int getXCoord() {
+    public double getXCoord() {
         return xCoord;
     }
 
-    public int getYCoord() {
+    public double getYCoord() {
         return yCoord;
     }
 

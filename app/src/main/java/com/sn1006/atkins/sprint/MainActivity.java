@@ -126,6 +126,13 @@ public class MainActivity extends FragmentActivity implements
 
         updateValuesFromBundle(savedInstanceState);
 
+        //pre-defined waypoint x and y coords for testing
+        double kevX = 45.293790;
+        double kevY = -75.856926;
+
+        //create waypoint object for start/stop point
+        Waypoint kevHouse = new Waypoint(kevX, kevY, "Kevin's House Circuit");
+
         buildGoogleApiClient();
         createLocationRequest();
         buildLocationSettingsRequest();
