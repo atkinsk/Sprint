@@ -21,6 +21,7 @@ class DistanceCalc {
     private double a; //Haversine Formula, circular distance between two points on a sphere
     private double c; //Angular Distance, in radians
     private double distanceTravelled; //meters
+    private double degreesToWaypoint; //degrees
 
     //See comment about access level modifier for the class
     DistanceCalc (){
@@ -29,6 +30,7 @@ class DistanceCalc {
         currentLongitude = 0.0; //radians
         previousLatitude = 0.0; //radians
         previousLongitude = 0.0; //radians
+        degreesToWaypoint = 0.0; //degrees
 
     }
 
@@ -55,5 +57,9 @@ class DistanceCalc {
         distanceTravelled =  radiusOfEarth * c;
 
         return distanceTravelled;
+    }
+
+    double getDegreesToWaypoint (Location currentLocation, Location waypointLocation){
+        return currentLocation.bearingTo(waypointLocation);
     }
 }
