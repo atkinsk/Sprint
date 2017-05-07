@@ -149,4 +149,14 @@
         app:layout_constraintLeft_toLeftOf="parent"
         android:textSize="20dp" />
 
+    <TextView
+        android:id="@+id/timer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="timer"
+        android:textSize="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="26dp"
+        tools:layout_editor_absoluteX="169dp" />
+
 </android.support.constraint.ConstraintLayout>
