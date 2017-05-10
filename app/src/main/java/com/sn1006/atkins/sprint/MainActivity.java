@@ -38,7 +38,7 @@ import static java.lang.Math.abs;
 public class MainActivity extends FragmentActivity implements
         OnConnectionFailedListener,
         ConnectionCallbacks,
-        LocationListener {
+        LocationListener, Runnable {
 
     protected GoogleApiClient mGoogleApiClient;
     protected String mLatitudeLabel = "x";
@@ -88,7 +88,7 @@ public class MainActivity extends FragmentActivity implements
     protected double mLatitudeMaxDiff = 0;
     protected double mLongitudeMaxDiff = 0;
     //set size of zone for testing waypoint arrival/departure
-    protected double mZoneSize = 15.0; //meters
+    protected double mZoneSize = 5.0; //meters
     protected boolean mIsInZone = false;
     protected double mWaypointBearing = 0.0; //degrees
     protected boolean mHasLeftZone = false;
@@ -148,12 +148,16 @@ public class MainActivity extends FragmentActivity implements
         //pre-defined waypoint x and y coords for testing
         double kevX = 45.293531;
         double kevY = -75.856726;
-        //double jonX = 37.4220;
-        //double jonY = -122.0840;
+        double jonX = 45.360282;
+        double jonY = -75.750125;
 
         //create Location object for start/stop point
-        mWaypoint.setLatitude(kevX);
-        mWaypoint.setLongitude(kevY);
+        //mWaypoint.setLatitude(kevX);
+        //mWaypoint.setLongitude(kevY);
+
+        //creat Location object for jon's house start/stop
+        mWaypoint.setLatitude(jonX);
+        mWaypoint.setLongitude(jonY);
 
         //let's see if we can get the timer working continuously....
         //human eye can register only as fast as every 30ms... so that's how often we will update
@@ -168,17 +172,18 @@ public class MainActivity extends FragmentActivity implements
                     //set text to the elapsed time managed by timer class
                     mTimerText.setText(t.getElapsedTime());
                     //update every 30 milliseconds
-                    handler.postDelayed(this, 30);
                 }
+                handler.postDelayed(this,30);
             }
         };
 
         //initially post the updater to the handler
-        handler.post(updater);
+        handler.postDelayed(updater, 30);
 
         buildGoogleApiClient();
         createLocationRequest();
         buildLocationSettingsRequest();
+
     }
 
     private void updateValuesFromBundle(Bundle savedInstanceState) {
@@ -525,6 +530,11 @@ public class MainActivity extends FragmentActivity implements
         if (mGoogleApiClient.isConnected()) {
             stopLocationUpdates();
         }
+    }
+
+    @Override
+    public void run() {
+        mTimerText.setText("RUNNING");
     }
 }
 
