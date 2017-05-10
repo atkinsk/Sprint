@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -114,6 +115,8 @@ public class MainActivity extends FragmentActivity implements
 
     //timer
     Timer t = new Timer();
+    //handler for timer
+    Handler handler;
 
     //Fires when the system first creates the Main Activity
     @Override
@@ -151,6 +154,27 @@ public class MainActivity extends FragmentActivity implements
         //create Location object for start/stop point
         mWaypoint.setLatitude(kevX);
         mWaypoint.setLongitude(kevY);
+
+        //let's see if we can get the timer working continuously....
+        //human eye can register only as fast as every 30ms... so that's how often we will update
+        //use an event handler to schedule the posting of the time at delayed intervals (30ms)
+        //implement runnable interface to set the text
+        handler = new Handler();
+
+        final Runnable updater = new Runnable() {
+            @Override
+            public void run() {
+                if (t.getRunning()) {
+                    //set text to the elapsed time managed by timer class
+                    mTimerText.setText(t.getElapsedTime());
+                    //update every 30 milliseconds
+                    handler.postDelayed(this, 30);
+                }
+            }
+        };
+
+        //initially post the updater to the handler
+        handler.post(updater);
 
         buildGoogleApiClient();
         createLocationRequest();
@@ -285,7 +309,6 @@ public class MainActivity extends FragmentActivity implements
             mDistanceFromWaypointText.setText(String.format("%s: %f", mLatitudeLabel, mDistanceFromWaypoint));
             mZoneStatusText.setText("IN THE ZONE? " + mIsInZone);
             mBearingToWaypointText.setText("Bearing to WP: " + mWaypointBearing);
-            mTimerText.setText(t.getElapsedTime());
         }
     }
 
