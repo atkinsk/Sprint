@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -37,7 +38,7 @@ import static java.lang.Math.abs;
 public class MainActivity extends FragmentActivity implements
         OnConnectionFailedListener,
         ConnectionCallbacks,
-        LocationListener {
+        LocationListener, Runnable {
 
     protected GoogleApiClient mGoogleApiClient;
     protected String mLatitudeLabel = "Lat";
@@ -72,15 +73,18 @@ public class MainActivity extends FragmentActivity implements
     protected double mNumberUpdates = 0;
 
     //set size of zone for testing waypoint arrival/departure
+
     protected double mZoneSize = 15.0; //meters
     protected boolean mIsInZone = false; //User is in the above listed radius in relation to start zone
     protected boolean mHasLeftZone = false; //User has left the start zone after triggering the timer
 
     protected TextView mNumberUpdatesText;
+
     protected TextView mZoneStatusText;
     protected TextView mTimerText;
     protected TextView mBearingToWaypointText;
     protected TextView mDistanceFromWaypointText;
+
 
     protected double mDistanceTravelled; //meters
     protected double mDistanceFromWaypoint; //meters
@@ -92,6 +96,8 @@ public class MainActivity extends FragmentActivity implements
     protected Location mWaypoint = new Location("waypoint");
     //Timer object
     protected Timer t = new Timer();
+    //handler for timer
+    Handler handler;
 
     //Fires when the system first creates the Main Activity
     @Override
@@ -114,16 +120,42 @@ public class MainActivity extends FragmentActivity implements
         //pre-defined waypoint x and y coords for testing
         double kevX = 45.293531;
         double kevY = -75.856726;
-        //double jonX = 37.4220;
-        //double jonY = -122.0840;
+        double jonX = 45.360282;
+        double jonY = -75.750125;
 
         //create Location object for start/stop point
-        mWaypoint.setLatitude(kevX);
-        mWaypoint.setLongitude(kevY);
+        //mWaypoint.setLatitude(kevX);
+        //mWaypoint.setLongitude(kevY);
+
+        //creat Location object for jon's house start/stop
+        mWaypoint.setLatitude(jonX);
+        mWaypoint.setLongitude(jonY);
+
+        //let's see if we can get the timer working continuously....
+        //human eye can register only as fast as every 30ms... so that's how often we will update
+        //use an event handler to schedule the posting of the time at delayed intervals (30ms)
+        //implement runnable interface to set the text
+        handler = new Handler();
+
+        final Runnable updater = new Runnable() {
+            @Override
+            public void run() {
+                if (t.getRunning()) {
+                    //set text to the elapsed time managed by timer class
+                    mTimerText.setText(t.getElapsedTime());
+                    //update every 30 milliseconds
+                }
+                handler.postDelayed(this,30);
+            }
+        };
+
+        //initially post the updater to the handler
+        handler.postDelayed(updater, 30);
 
         buildGoogleApiClient();
         createLocationRequest();
         buildLocationSettingsRequest();
+
     }
 
     private void updateValuesFromBundle(Bundle savedInstanceState) {
@@ -244,7 +276,6 @@ public class MainActivity extends FragmentActivity implements
             mDistanceFromWaypointText.setText(String.format("%s: %f", "Dist from WP:", mDistanceFromWaypoint));
             mZoneStatusText.setText("IN THE ZONE? " + mIsInZone);
             mBearingToWaypointText.setText("Bearing to WP: " + mWaypointBearing);
-            mTimerText.setText(t.getElapsedTime());
         }
     }
 
@@ -417,6 +448,11 @@ public class MainActivity extends FragmentActivity implements
         if (mGoogleApiClient.isConnected()) {
             stopLocationUpdates();
         }
+    }
+
+    @Override
+    public void run() {
+        mTimerText.setText("RUNNING");
     }
 }
 
