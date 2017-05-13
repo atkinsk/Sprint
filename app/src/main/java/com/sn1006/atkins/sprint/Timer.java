@@ -22,8 +22,12 @@ public class Timer {
         this.running = false;
     }
 
-    public boolean getRunning(){
+    public boolean getRunning() {
         return this.running;
+    }
+
+    public Long getLaptime() {
+        return stopTime - startTime;
     }
 
     //return a string with the elapsed time in format of mins:seconds:millis

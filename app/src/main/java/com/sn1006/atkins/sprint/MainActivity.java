@@ -99,6 +99,9 @@ public class MainActivity extends FragmentActivity implements
     //handler for timer
     Handler handler;
 
+    //create a session object to store laptimes ------- TO BE MODIFIED IN FUTURE WHEN MULTIPLE SESSIONS EXIST
+    Session mySession = new Session("Test Track", "Fettle");
+
     //Fires when the system first creates the Main Activity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -133,7 +136,7 @@ public class MainActivity extends FragmentActivity implements
         mWaypoint.setLongitude(jonY);
 */
 
-        //let's see if we can get the timer working continuously....
+        //implement continuously updating timer
         //human eye can register only as fast as every 30ms... so that's how often we will update
         //use an event handler to schedule the posting of the time at delayed intervals (30ms)
         //implement runnable interface to set the text
@@ -360,7 +363,15 @@ public class MainActivity extends FragmentActivity implements
             if (t.getRunning() && mHasLeftZone && isUserPastStartPoint()) {
                 t.stop();
                 mHasLeftZone = false;
-                //Future implementation: timer will be reset here, and first lap saved
+                //Lap done, record it!
+                /*--------------------------------------------------------------------------
+                ** AT THE MOMENT, RECORD LAPTIMES IN A SESSION CREATED IN ONCREATE()
+                ** IN FUTURE THERE WILL BE MULTIPLE SESSIONS
+                ** SO WE WILL HAVE AN OBJECT THAT HOLDS A LIST OF SESSIONS (HASHMAP?)
+                ** AND WILL HAVE TO ADD IT TO THE PROPER SESSION
+                **--------------------------------------------------------------------------
+                 */
+                mySession.addLap(t.getLaptime());
             }
         } else {
             //The user has left the zone
