@@ -40,8 +40,8 @@ public class MainActivity extends FragmentActivity implements
         LocationListener {
 
     protected GoogleApiClient mGoogleApiClient;
-    protected String mLatitudeLabel = "x";
-    protected String mLongitudeLabel = "y";
+    protected String mLatitudeLabel = "Lat";
+    protected String mLongitudeLabel = "Long";
     protected TextView mLatitudeText;
     protected TextView mLongitudeText;
     protected static final String TAG = "MainActivity";
@@ -68,52 +68,30 @@ public class MainActivity extends FragmentActivity implements
     //Request code used for requestPermissions. Must be >=0
     protected final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 23;
 
-    //GPS Location averaging counter and calculation variables
-    protected double mAvgGpsCounter = 0;
-    protected double mBaseLatitude = 0;
-    protected double mBaseLongitude = 0;
-    protected double mCurrentLatitude = 0;
-    protected double mCurrentLongitude = 0;
-    protected double mLatitudeDiff = 0;
-    protected double mLongitudeDiff = 0;
-    protected double mLatitudeSum = 0;
-    protected double mLongitudeSum = 0;
-    protected double mLatitudeAverage = 0;
-    protected double mLongitudeAverage = 0;
-    protected double mLatitudeSumDiff = 0;
-    protected double mLongitudeSumDiff = 0;
-    protected double mLatitudeAvgDiff = 0;
-    protected double mLongitudeAvgDiff = 0;
-    protected double mLatitudeMaxDiff = 0;
-    protected double mLongitudeMaxDiff = 0;
+    //Number of GPS updates Sprint has collected
+    protected double mNumberUpdates = 0;
+
     //set size of zone for testing waypoint arrival/departure
     protected double mZoneSize = 15.0; //meters
-    protected boolean mIsInZone = false;
-    protected double mWaypointBearing = 0.0; //degrees
-    protected boolean mHasLeftZone = false;
+    protected boolean mIsInZone = false; //User is in the above listed radius in relation to start zone
+    protected boolean mHasLeftZone = false; //User has left the start zone after triggering the timer
 
-    protected TextView mLatitudeDiffText;
-    protected TextView mLongitudeDiffText;
-    protected TextView mLatMaxDiffText;
-    protected TextView mLongMaxDiffText;
-    protected TextView mLatAvgDiffText;
-    protected TextView mLongAvgDiffText;
-    protected TextView mLatAvgText;
-    protected TextView mLongAvgText;
-    protected TextView mGpsCounterText;
+    protected TextView mNumberUpdatesText;
     protected TextView mZoneStatusText;
     protected TextView mTimerText;
     protected TextView mBearingToWaypointText;
-
-    protected DistanceCalc distanceCalc = new DistanceCalc();
-    protected double mDistanceTravelled;
-    protected double mDistanceFromWaypoint;
-    protected TextView mDistanceTravelledText;
-    Location mWaypoint = new Location("waypoint");
     protected TextView mDistanceFromWaypointText;
 
-    //timer
-    Timer t = new Timer();
+    protected double mDistanceTravelled; //meters
+    protected double mDistanceFromWaypoint; //meters
+    protected double mWaypointBearing = 0.0; //degrees
+
+    //DistanceCalc object
+    protected DistanceCalc distanceCalc = new DistanceCalc();
+    //Waypoint location object
+    protected Location mWaypoint = new Location("waypoint");
+    //Timer object
+    protected Timer t = new Timer();
 
     //Fires when the system first creates the Main Activity
     @Override
@@ -123,16 +101,7 @@ public class MainActivity extends FragmentActivity implements
 
         mLatitudeText = (TextView) findViewById(R.id.latitude);
         mLongitudeText = (TextView) findViewById(R.id.longitude);
-        mLatitudeDiffText = (TextView) findViewById(R.id.latitudeDifference);
-        mLongitudeDiffText = (TextView) findViewById(R.id.longitudeDifference);
-        mLatMaxDiffText = (TextView) findViewById(R.id.latMaxDiff);
-        mLongMaxDiffText = (TextView) findViewById(R.id.LongMaxDiff);
-        mLatAvgDiffText = (TextView) findViewById(R.id.LatAvgDiff);
-        mLongAvgDiffText = (TextView) findViewById(R.id.LongAvgDiff);
-        mLatAvgText = (TextView) findViewById(R.id.AvgLat);
-        mLongAvgText = (TextView) findViewById(R.id.AvgLong);
-        mGpsCounterText = (TextView) findViewById(R.id.gpsCounter);
-        mDistanceTravelledText = (TextView) findViewById(R.id.distTravelled);
+        mNumberUpdatesText = (TextView) findViewById(R.id.gpsCounter);
         mDistanceFromWaypointText = (TextView) findViewById(R.id.distWaypoint);
         mZoneStatusText = (TextView) findViewById(R.id.zoneStatus);
         mTimerText = (TextView) findViewById(R.id.timer);
@@ -271,18 +240,8 @@ public class MainActivity extends FragmentActivity implements
                     mCurrentLocation.getLatitude()));
             mLongitudeText.setText(String.format("%s: %f", mLongitudeLabel,
                     mCurrentLocation.getLongitude()));
-
-            mLatitudeDiffText.setText(String.format("%s: %f", mLatitudeLabel, mLatitudeDiff));
-            mLongitudeDiffText.setText(String.format("%s: %f", mLongitudeLabel, mLongitudeDiff));
-            mLatMaxDiffText.setText(String.format("%s: %f", mLatitudeLabel, mLatitudeMaxDiff));
-            mLongMaxDiffText.setText(String.format("%s: %f", mLatitudeLabel, mLongitudeMaxDiff));
-            mLatAvgDiffText.setText(String.format("%s: %f", mLatitudeLabel, mLatitudeAvgDiff));
-            mLongAvgDiffText.setText(String.format("%s: %f", mLatitudeLabel, mLongitudeAvgDiff));
-            mLatAvgText.setText((String.format("%s: %f", mLatitudeLabel, mLatitudeAverage)));
-            mLongAvgText.setText(String.format("%s: %f", mLatitudeLabel, mLongitudeAverage));
-            mGpsCounterText.setText(String.format("%s: %f", mLatitudeLabel, mAvgGpsCounter));
-            mDistanceTravelledText.setText(String.format("%s: %f", mLatitudeLabel, mDistanceTravelled));
-            mDistanceFromWaypointText.setText(String.format("%s: %f", mLatitudeLabel, mDistanceFromWaypoint));
+            mNumberUpdatesText.setText(String.format("%s: %f", "# Updates", mNumberUpdates));
+            mDistanceFromWaypointText.setText(String.format("%s: %f", "Dist from WP:", mDistanceFromWaypoint));
             mZoneStatusText.setText("IN THE ZONE? " + mIsInZone);
             mBearingToWaypointText.setText("Bearing to WP: " + mWaypointBearing);
             mTimerText.setText(t.getElapsedTime());
@@ -350,61 +309,32 @@ public class MainActivity extends FragmentActivity implements
         }
     }
 
-    public void locationCoordinateDifference() {
-        //Increment counter to ignore initial GPS location
-        if (mAvgGpsCounter <= 10) {
-            mAvgGpsCounter++;
-            return;
-        }
+    public void isUserInStartZone() {
+        //Checks to see if the user is in the specified radius near the start / end point
+        if (mDistanceFromWaypoint < mZoneSize) {
+            //The user is in the zone
+            mIsInZone = true;
 
-        //On the eleventh GPS coordinate, set the base values for latitude and longitude calculations
-        if (mAvgGpsCounter == 11) {
-            //Pull baseline latitude and longitude from location services
-            mBaseLatitude = mCurrentLocation.getLatitude();
-            mBaseLongitude = mCurrentLocation.getLongitude();
-            //Pull baseline latitude and longitude for average calulation
-            mLatitudeSum += mBaseLatitude;
-            mLongitudeSum += mBaseLongitude;
-
-            mAvgGpsCounter++;
-            return;
-        }
-        //On each subsequent GPS coordinate, calculate the difference to the base
-        if (mAvgGpsCounter > 11) {
-            //Pull current latitude and longitude from location services
-            mCurrentLatitude = mCurrentLocation.getLatitude();
-            mCurrentLongitude = mCurrentLocation.getLongitude();
-
-            //Calculate latitude and longitude differences from baselinepo[/.
-            mLatitudeDiff = mBaseLatitude - mCurrentLatitude;
-            mLongitudeDiff = mBaseLongitude - mCurrentLongitude;
-
-            //Calculation of Average latitude and longitude
-            mLatitudeSum += mCurrentLatitude;
-            mLongitudeSum += mCurrentLongitude;
-            mLatitudeAverage = mLatitudeSum / (mAvgGpsCounter - 10);
-            mLongitudeAverage = mLongitudeSum / (mAvgGpsCounter - 10);
-
-            //Calculation of Average latitude and longitude differences from initial value
-            mLatitudeSumDiff += mLatitudeDiff;
-            mLongitudeSumDiff += mLongitudeDiff;
-            mLatitudeAvgDiff = mLatitudeSumDiff / (mAvgGpsCounter - 10);
-            mLongitudeAvgDiff = mLongitudeSumDiff / (mAvgGpsCounter - 10);
-
-            //Determine max deviation from baseline latitude
-            if (abs(mLatitudeMaxDiff) < abs(mLatitudeDiff)) {
-                mLatitudeMaxDiff = mLatitudeDiff;
+            //Calculates the bearings of the user's current location relative to the start point
+            mWaypointBearing = distanceCalc.getDegreesToWaypoint(mCurrentLocation, mWaypoint);
+            //When the timer is not running, start the timer
+            if (!t.getRunning()) {
+                t.start();
             }
-
-            //Determine max deviation from baseline longitude
-            if (abs(mLongitudeMaxDiff) < abs(mLongitudeDiff)) {
-                mLongitudeMaxDiff = mLongitudeDiff;
+            //When the timer is running the timer will be stopped if and only if the user has
+            //already left the start zone and returned to it. This keeps the timer from stopping
+            //if the GPS coordinates of the user are in the start zone for two GPS pings
+            if (t.getRunning() && mHasLeftZone) {
+                t.stop();
+                mHasLeftZone = false;
+                //Future implementation: timer will be reset here, and first lap saved
             }
-
-            mAvgGpsCounter++;
+        } else {
+            //The user has left the zone
+            mIsInZone = false;
+            mHasLeftZone = true;
         }
     }
-
 
     //Fires when the google play location services is connected
     @Override
@@ -440,34 +370,19 @@ public class MainActivity extends FragmentActivity implements
 
     @Override
     public void onLocationChanged(Location location) {
-        //When at least one instance of the GPS coordinates exist, set the previous location
+        //Set the previous location to the current GPS Location
         //This will allow for distance calculations between the last and current gps coordinates
         mPreviousLocation = mCurrentLocation;
         mCurrentLocation = location;
+        //Distance from current location to previous location
         mDistanceTravelled = mCurrentLocation.distanceTo(mPreviousLocation);
+        //Distance from current location to waypoint location
         mDistanceFromWaypoint = mCurrentLocation.distanceTo(mWaypoint);
 
-        if (mDistanceFromWaypoint < mZoneSize) {
-            //we are in the zone
-            mIsInZone = true;
-            mWaypointBearing = distanceCalc.getDegreesToWaypoint(mCurrentLocation, mWaypoint);
+        //Controls lap timer functionality based on location relative to the user and the waypoint
+        isUserInStartZone();
 
-            if(!t.getRunning()){
-                t.start();
-            }
-
-            if(t.getRunning() && mHasLeftZone){
-                t.stop();
-                mHasLeftZone = false;
-                //timer will be reset here, and first lap saved
-            }
-
-        } else {
-            mIsInZone = false;
-            mHasLeftZone = true;
-        }
-
-        locationCoordinateDifference();
+        mNumberUpdates++;
         updateLocationUI();
     }
 
