@@ -17,19 +17,21 @@ public class Session {
 
     private String trackname;
     private String driver;
-    private Long bestLap;
-    private ArrayList<Long> laptimes;
+    private long bestLap;
+    public ArrayList<Long> laptimes;
 
     //session needs an id (date/timestamp) to differentiate it
     public Session(String aTrack, String aDriver) {
         this.trackname = aTrack;
         this.driver = aDriver;
         this.laptimes = new ArrayList<Long>();
-        this.bestLap = null;
     }
 
     //add a lap to the session
     public void addLap(Long laptime) {
+        if(laptimes.isEmpty()) {
+            this.bestLap = laptime;
+        }
         this.laptimes.add(laptime);
         checkBestLap(laptime);
     }
@@ -61,7 +63,7 @@ public class Session {
     public String toString() {
         String laptimesAsString = "";
 
-        for(Long x : this.laptimes) {
+        for(long x : this.laptimes) {
             //if best lap, bold it
             if(x == this.bestLap) {
                 laptimesAsString += "<b>" + formatLaptime(x) + "</b>" + "\n";

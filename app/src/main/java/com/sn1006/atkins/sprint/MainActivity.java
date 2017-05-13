@@ -74,7 +74,7 @@ public class MainActivity extends FragmentActivity implements
 
     //set size of zone for testing waypoint arrival/departure
 
-    protected double mZoneSize = 15.0; //meters
+    protected double mZoneSize = 5.0; //meters
     protected boolean mIsInZone = false; //User is in the above listed radius in relation to start zone
     protected boolean mHasLeftZone = false; //User has left the start zone after triggering the timer
 
@@ -83,6 +83,9 @@ public class MainActivity extends FragmentActivity implements
     protected TextView mTimerText;
     protected TextView mBearingToWaypointText;
     protected TextView mDistanceFromWaypointText;
+
+    //TEMPORARY TEXTVIEW FOR TESTING PURPOSES - FUTURE WILL BE ON SEPARATE ACTIVITY
+    protected TextView mLaptimesText;
 
 
     protected double mDistanceTravelled; //meters
@@ -116,6 +119,9 @@ public class MainActivity extends FragmentActivity implements
         mTimerText = (TextView) findViewById(R.id.timer);
         mBearingToWaypointText = (TextView) findViewById(R.id.bearingToWaypoint);
 
+        //AGAIN, THIS IS A TEMP TEXT VIEW TO BE REMOVED ONCE LAPTIMES HAS ITS OWN ACTIVITY
+        mLaptimesText = (TextView) findViewById(R.id.showLaptimes);
+
         mRequestingLocationUpdates = false;
 
         updateValuesFromBundle(savedInstanceState);
@@ -125,16 +131,16 @@ public class MainActivity extends FragmentActivity implements
         double kevY = -75.856726;
         double jonX = 45.360282;
         double jonY = -75.750125;
-
+/*
         //create Location object for start/stop point
         mWaypoint.setLatitude(kevX);
         mWaypoint.setLongitude(kevY);
 
-/*
+*/
         //create Location object for jon's house start/stop
         mWaypoint.setLatitude(jonX);
         mWaypoint.setLongitude(jonY);
-*/
+//*/
 
         //implement continuously updating timer
         //human eye can register only as fast as every 30ms... so that's how often we will update
@@ -360,18 +366,20 @@ public class MainActivity extends FragmentActivity implements
             //When the timer is running the timer will be stopped if and only if the user has
             //already left the start zone and returned to it. This keeps the timer from stopping
             //if the GPS coordinates of the user are in the start zone for two GPS pings
-            if (t.getRunning() && mHasLeftZone && isUserPastStartPoint()) {
+            if (t.getRunning() && mHasLeftZone /*&& isUserPastStartPoint()*/) {
                 t.stop();
                 mHasLeftZone = false;
                 //Lap done, record it!
                 /*--------------------------------------------------------------------------
-                ** AT THE MOMENT, RECORD LAPTIMES IN A SESSION CREATED IN ONCREATE()
-                ** IN FUTURE THERE WILL BE MULTIPLE SESSIONS
+                ** CURRENTLY RECORDING LAPTIMES IN A SESSION CREATED IN ONCREATE()
+                ** IN FUTURE THERE WILL BE MULTIPLE SESSIONS...
                 ** SO WE WILL HAVE AN OBJECT THAT HOLDS A LIST OF SESSIONS (HASHMAP?)
                 ** AND WILL HAVE TO ADD IT TO THE PROPER SESSION
                 **--------------------------------------------------------------------------
                  */
                 mySession.addLap(t.getLaptime());
+                //update laptimes textview with a list of the session's laptimes
+                mLaptimesText.setText(mySession.toString());
             }
         } else {
             //The user has left the zone
