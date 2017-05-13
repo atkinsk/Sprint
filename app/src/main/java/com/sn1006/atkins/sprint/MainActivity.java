@@ -79,7 +79,6 @@ public class MainActivity extends FragmentActivity implements
     protected boolean mHasLeftZone = false; //User has left the start zone after triggering the timer
 
     protected TextView mNumberUpdatesText;
-
     protected TextView mZoneStatusText;
     protected TextView mTimerText;
     protected TextView mBearingToWaypointText;
@@ -88,7 +87,8 @@ public class MainActivity extends FragmentActivity implements
 
     protected double mDistanceTravelled; //meters
     protected double mDistanceFromWaypoint; //meters
-    protected double mWaypointBearing = 0.0; //degrees
+    protected double mWaypointBearing; //degrees
+    protected double mPreviousWaypointBearing; //degrees
 
     //DistanceCalc object
     protected DistanceCalc distanceCalc = new DistanceCalc();
@@ -124,12 +124,14 @@ public class MainActivity extends FragmentActivity implements
         double jonY = -75.750125;
 
         //create Location object for start/stop point
-        //mWaypoint.setLatitude(kevX);
-        //mWaypoint.setLongitude(kevY);
+        mWaypoint.setLatitude(kevX);
+        mWaypoint.setLongitude(kevY);
 
-        //creat Location object for jon's house start/stop
+/*
+        //create Location object for jon's house start/stop
         mWaypoint.setLatitude(jonX);
         mWaypoint.setLongitude(jonY);
+*/
 
         //let's see if we can get the timer working continuously....
         //human eye can register only as fast as every 30ms... so that's how often we will update
@@ -340,7 +342,7 @@ public class MainActivity extends FragmentActivity implements
         }
     }
 
-    public void isUserInStartZone() {
+    protected void isUserInStartZone() {
         //Checks to see if the user is in the specified radius near the start / end point
         if (mDistanceFromWaypoint < mZoneSize) {
             //The user is in the zone
@@ -355,7 +357,7 @@ public class MainActivity extends FragmentActivity implements
             //When the timer is running the timer will be stopped if and only if the user has
             //already left the start zone and returned to it. This keeps the timer from stopping
             //if the GPS coordinates of the user are in the start zone for two GPS pings
-            if (t.getRunning() && mHasLeftZone) {
+            if (t.getRunning() && mHasLeftZone && isUserPastStartPoint()) {
                 t.stop();
                 mHasLeftZone = false;
                 //Future implementation: timer will be reset here, and first lap saved
@@ -365,6 +367,19 @@ public class MainActivity extends FragmentActivity implements
             mIsInZone = false;
             mHasLeftZone = true;
         }
+        mPreviousWaypointBearing = mWaypointBearing;
+    }
+
+    protected boolean isUserPastStartPoint(){
+        double bearingDifference = Math.abs(mPreviousWaypointBearing-mWaypointBearing);
+        int minimumBearingDelta = 105;
+/*      If a large bearing difference occurs (greater than minimumBearingDelta), then the user has
+        passed the start line and the timer should stop*/
+        if(bearingDifference >= minimumBearingDelta){
+            return true;
+        }
+        //The user has not passed the start line even though they are in the start zone.
+        return false;
     }
 
     //Fires when the google play location services is connected
