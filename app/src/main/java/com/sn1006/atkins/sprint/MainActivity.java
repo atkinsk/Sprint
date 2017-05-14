@@ -139,7 +139,6 @@ public class MainActivity extends FragmentActivity implements
         //human eye can register only as fast as every 30ms... so that's how often we will update
         //use an event handler to schedule the posting of the time at delayed intervals (30ms)
         //implement runnable interface to set the text
-
         final Runnable updater = new Runnable() {
             @Override
             public void run() {
@@ -304,15 +303,13 @@ public class MainActivity extends FragmentActivity implements
 /*    protected void permissionCheck() {
         if (Build.VERSION.SDK_INT >= 23 && ContextCompat.checkSelfPermission(MainActivity.this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED){ *//*&&
+                != PackageManager.PERMISSION_GRANTED &&
                 ContextCompat.checkSelfPermission(MainActivity.this,
                         android.Manifest.permission.ACCESS_COARSE_LOCATION)
-                        != PackageManager.PERMISSION_GRANTED) {*//*
-
+                        != PackageManager.PERMISSION_GRANTED) {
 
             //If permission has been denied, lets the user know that the app cannot be operated
             //without the location permissions enabled
-
             if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,
                     Manifest.permission.ACCESS_FINE_LOCATION)) {
                 Toast.makeText(MainActivity.this,
@@ -369,6 +366,7 @@ public class MainActivity extends FragmentActivity implements
     }
 
     protected void isUserInStartZone() {
+        mDistanceTravelled = mCurrentLocation.distanceTo(mPreviousLocation);
         //Checks to see if the user is in the specified radius near the start / end point
         if (mDistanceFromWaypoint < mZoneSize) {
             //The user is in the zone
@@ -462,8 +460,9 @@ public class MainActivity extends FragmentActivity implements
         //This will allow for distance calculations between the last and current gps coordinates
         mPreviousLocation = mCurrentLocation;
         mCurrentLocation = location;
-        //Distance from current location to previous location
-        mDistanceTravelled = mCurrentLocation.distanceTo(mPreviousLocation);
+                    //This causes the app to crash during first permission checks
+                   /* //Distance from current location to previous location
+                    mDistanceTravelled = mCurrentLocation.distanceTo(mPreviousLocation);*/
         //Distance from current location to waypoint location
         mDistanceFromWaypoint = mCurrentLocation.distanceTo(mWaypoint);
 
