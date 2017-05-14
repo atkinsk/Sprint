@@ -13,53 +13,35 @@ import static java.lang.Math.*;
 //There is no access level (i.e. public) as the default is package-private which makes it so this
     //class is only visible within the package
 class DistanceCalc {
-    private static double radiusOfEarth =6371000; //meters
-    private double currentLatitude; //degrees, current GPS coordinate (latitude)
-    private double currentLongitude; //degrees, current GPS coordinate (longitude)
-    private double previousLatitude; //degrees, last GPS coordinate (latitude)
-    private double previousLongitude; //degrees, last GPS coordinate (longitude)
-    private double a; //Haversine Formula, circular distance between two points on a sphere
-    private double c; //Angular Distance, in radians
     private double distanceTravelled; //meters
-    private double degreesToWaypoint; //degrees
+    private double initialSpeed; // m/s
+    private double finalSpeed; //m/s
+    private double averageAcceleration; //m/s^2
+    private double finishTime; //seconds
 
     //See comment about access level modifier for the class
     DistanceCalc (){
-        distanceTravelled = 0.0; //meters
-        currentLatitude = 0.0; //radians
-        currentLongitude = 0.0; //radians
-        previousLatitude = 0.0; //radians
-        previousLongitude = 0.0; //radians
-        degreesToWaypoint = 0.0; //degrees
+        distanceTravelled = 0.0;
+        finishTime = 0.0;
+        initialSpeed = 0.0;
+        finalSpeed = 0.0;
+        averageAcceleration = 0.0;
 
     }
+    //Calculates the time at the finish point using the acceleration, initial velocity and
+    //distance to the final waypoint using the quadratic equation
+    double timeAtFinish (Location currentLocation, Location previousLocation){
+        initialSpeed = previousLocation.getSpeed();
+        finalSpeed = currentLocation.getSpeed();
+        //Acceleration is approximated using parameters from Location Services.
+        //Time is approximated to 1 second until accelerometer is used
+        averageAcceleration = (finalSpeed - initialSpeed) / 1.0;
+        distanceTravelled = previousLocation.distanceTo(currentLocation);
 
-    //See comment about access level modifier for the class
-    double coordinatesToDistance (Location currentLocation, Location previousLocation){
-        //Converts current and previous gps coordinates from degrees to radians
-        currentLatitude = toRadians(currentLocation.getLatitude());
-        currentLongitude = toRadians(currentLocation.getLongitude());
-        previousLatitude = toRadians(previousLocation.getLatitude());
-        previousLongitude = toRadians(previousLocation.getLongitude());
+        finishTime = (-initialSpeed + Math.sqrt((initialSpeed*initialSpeed)
+                -(2*averageAcceleration*(-distanceTravelled)))/averageAcceleration);
 
-
-        //Calculates the Haversine Formula to determine the ciruclar distance between two points on a sphere
-        //Did not use Math.pow as doing x * x multiplication yields better performance
-        a = (sin(currentLatitude - previousLatitude) * sin(currentLatitude - previousLatitude))
-                + (cos(currentLatitude) * cos(previousLatitude)
-                * sin(currentLongitude - previousLongitude) * sin(currentLongitude - previousLongitude));
-
-        //Calculates the angular distance using the Haversine Formula
-        c = 2* atan2(sqrt(a), sqrt(1-a));
-
-        //Calculates the distance travelled as the crow flies based on the angular distance and the
-        //radius of the Earth
-        distanceTravelled =  radiusOfEarth * c;
-
-        return distanceTravelled;
+        return finishTime;
     }
 
-    double getDegreesToWaypoint (Location currentLocation, Location waypointLocation){
-        return currentLocation.bearingTo(waypointLocation);
-    }
 }

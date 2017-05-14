@@ -74,7 +74,7 @@ public class MainActivity extends FragmentActivity implements
 
     //set size of zone for testing waypoint arrival/departure
 
-    protected double mZoneSize = 15.0; //meters
+    protected double mZoneSize = 7; //meters
     protected boolean mIsInZone = false; //User is in the above listed radius in relation to start zone
     protected boolean mHasLeftZone = false; //User has left the start zone after triggering the timer
 
@@ -349,7 +349,8 @@ public class MainActivity extends FragmentActivity implements
             mIsInZone = true;
 
             //Calculates the bearings of the user's current location relative to the start point
-            mWaypointBearing = distanceCalc.getDegreesToWaypoint(mCurrentLocation, mWaypoint);
+            //mWaypointBearing = distanceCalc.getDegreesToWaypoint(mCurrentLocation, mWaypoint);
+            mWaypointBearing = mCurrentLocation.bearingTo(mWaypoint);
             //When the timer is not running, start the timer
             if (!t.getRunning()) {
                 t.start();
@@ -359,6 +360,7 @@ public class MainActivity extends FragmentActivity implements
             //if the GPS coordinates of the user are in the start zone for two GPS pings
             //Also checks to see if the user has crossed the start point via bearings delta
             if (t.getRunning() && mHasLeftZone && isUserPastStartPoint()) {
+                double subtractTime = distanceCalc.timeAtFinish(mCurrentLocation, mPreviousLocation);
                 t.stop();
                 mHasLeftZone = false;
                 //Future implementation: timer will be reset here, and first lap saved
