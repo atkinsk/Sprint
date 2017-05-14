@@ -275,9 +275,9 @@ public class MainActivity extends FragmentActivity implements
             mLongitudeText.setText(String.format("%s: %f", mLongitudeLabel,
                     mCurrentLocation.getLongitude()));
             mNumberUpdatesText.setText(String.format("%s: %f", "# Updates", mNumberUpdates));
-            mDistanceFromWaypointText.setText(String.format("%s: %f", "Dist from WP:", mDistanceFromWaypoint));
+            mDistanceFromWaypointText.setText(String.format("%s: %f", "Dist from WP", mDistanceFromWaypoint));
             mZoneStatusText.setText("IN THE ZONE? " + mIsInZone);
-            mBearingToWaypointText.setText("Bearing to WP: " + normalizeDegrees(mWaypointBearing));
+            mBearingToWaypointText.setText("Bearing to WP " + normalizeDegrees(mWaypointBearing));
         }
     }
 
@@ -366,7 +366,6 @@ public class MainActivity extends FragmentActivity implements
     }
 
     protected void isUserInStartZone() {
-        mDistanceTravelled = mCurrentLocation.distanceTo(mPreviousLocation);
         //Checks to see if the user is in the specified radius near the start / end point
         if (mDistanceFromWaypoint < mZoneSize) {
             //The user is in the zone
@@ -436,8 +435,6 @@ public class MainActivity extends FragmentActivity implements
         }
         if (mRequestingLocationUpdates) {
             Log.i(TAG, "in onConnected(), starting location updates");
-            //is this second permissionCheck necessary? Investigate
-            permissionCheck();
             startLocationUpdates();
         }
     }
