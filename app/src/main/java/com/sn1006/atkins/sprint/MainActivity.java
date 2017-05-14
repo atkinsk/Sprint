@@ -97,7 +97,7 @@ public class MainActivity extends FragmentActivity implements
     //Timer object
     protected Timer t = new Timer();
     //handler for timer
-    Handler handler;
+    protected Handler handler = new Handler();
 
     //Fires when the system first creates the Main Activity
     @Override
@@ -122,6 +122,8 @@ public class MainActivity extends FragmentActivity implements
         double kevY = -75.856726;
         double jonX = 45.360282;
         double jonY = -75.750125;
+        double watGlenX = 42.341040;
+        double watGlenY = -76.928847;
 
         //create Location object for start/stop point
         mWaypoint.setLatitude(kevX);
@@ -137,7 +139,6 @@ public class MainActivity extends FragmentActivity implements
         //human eye can register only as fast as every 30ms... so that's how often we will update
         //use an event handler to schedule the posting of the time at delayed intervals (30ms)
         //implement runnable interface to set the text
-        handler = new Handler();
 
         final Runnable updater = new Runnable() {
             @Override
@@ -147,7 +148,7 @@ public class MainActivity extends FragmentActivity implements
                     mTimerText.setText(t.getElapsedTime());
                     //update every 30 milliseconds
                 }
-                handler.postDelayed(this,30);
+                handler.postDelayed(this, 30);
             }
         };
 
@@ -219,7 +220,7 @@ public class MainActivity extends FragmentActivity implements
                 mLocationSettingsRequest
         ).setResultCallback(new ResultCallback<LocationSettingsResult>() {
             @Override
-            public void onResult(@NonNull LocationSettingsResult locationSettingsResult) {
+            public void onResult(LocationSettingsResult locationSettingsResult) {
                 final Status status = locationSettingsResult.getStatus();
                 switch (status.getStatusCode()) {
                     case LocationSettingsStatusCodes.SUCCESS:
@@ -261,7 +262,7 @@ public class MainActivity extends FragmentActivity implements
                 this
         ).setResultCallback(new ResultCallback<Status>() {
             @Override
-            public void onResult(@NonNull Status status) {
+            public void onResult(Status status) {
                 mRequestingLocationUpdates = false;
             }
         });
@@ -277,7 +278,7 @@ public class MainActivity extends FragmentActivity implements
             mNumberUpdatesText.setText(String.format("%s: %f", "# Updates", mNumberUpdates));
             mDistanceFromWaypointText.setText(String.format("%s: %f", "Dist from WP:", mDistanceFromWaypoint));
             mZoneStatusText.setText("IN THE ZONE? " + mIsInZone);
-            mBearingToWaypointText.setText("Bearing to WP: " + mWaypointBearing);
+            mBearingToWaypointText.setText("Bearing to WP: " + normalizeDegrees(mWaypointBearing));
         }
     }
 
@@ -300,15 +301,18 @@ public class MainActivity extends FragmentActivity implements
 
     }
 
-    protected void permissionCheck() {
+/*    protected void permissionCheck() {
         if (Build.VERSION.SDK_INT >= 23 && ContextCompat.checkSelfPermission(MainActivity.this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED &&
+                != PackageManager.PERMISSION_GRANTED){ *//*&&
                 ContextCompat.checkSelfPermission(MainActivity.this,
                         android.Manifest.permission.ACCESS_COARSE_LOCATION)
-                        != PackageManager.PERMISSION_GRANTED) {
+                        != PackageManager.PERMISSION_GRANTED) {*//*
+
+
             //If permission has been denied, lets the user know that the app cannot be operated
             //without the location permissions enabled
+
             if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,
                     Manifest.permission.ACCESS_FINE_LOCATION)) {
                 Toast.makeText(MainActivity.this,
@@ -319,6 +323,21 @@ public class MainActivity extends FragmentActivity implements
                         MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
             }
         }
+        mRequestingLocationUpdates = true;
+    }*/
+
+    protected void permissionCheck() {
+        if (Build.VERSION.SDK_INT >= 23 && ContextCompat.checkSelfPermission(MainActivity.this,
+                Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(MainActivity.this,
+                        android.Manifest.permission.ACCESS_COARSE_LOCATION)
+                        != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(MainActivity.this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+            }
         mRequestingLocationUpdates = true;
     }
 
@@ -336,9 +355,16 @@ public class MainActivity extends FragmentActivity implements
                 } else {
                     // permission denied. Do not proceed with GPS location check
                     mRequestingLocationUpdates = false;
+                    //If permission has been denied, lets the user know that the app cannot be operated
+                    //without the location permissions enabled
+                    if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,
+                            Manifest.permission.ACCESS_FINE_LOCATION)) {
+                        Toast.makeText(MainActivity.this,
+                                "Location permissions required to operate Sprint", Toast.LENGTH_LONG).show();
+                    }
                 }
+                // Include any other permission requests after this point
             }
-            // Include any other permission requests after this point
         }
     }
 
@@ -357,6 +383,7 @@ public class MainActivity extends FragmentActivity implements
             //When the timer is running the timer will be stopped if and only if the user has
             //already left the start zone and returned to it. This keeps the timer from stopping
             //if the GPS coordinates of the user are in the start zone for two GPS pings
+            //Also checks to see if the user has crossed the start point via bearings delta
             if (t.getRunning() && mHasLeftZone && isUserPastStartPoint()) {
                 t.stop();
                 mHasLeftZone = false;
@@ -370,16 +397,31 @@ public class MainActivity extends FragmentActivity implements
         mPreviousWaypointBearing = mWaypointBearing;
     }
 
-    protected boolean isUserPastStartPoint(){
-        double bearingDifference = Math.abs(mPreviousWaypointBearing-mWaypointBearing);
-        int minimumBearingDelta = 105;
+    //Determines if the user has past the start / end point
+    protected boolean isUserPastStartPoint() {
+        int minimumBearingDelta = 105; //degrees
+
+        double bearingDifference = Math.abs(normalizeDegrees(mPreviousWaypointBearing)
+                - normalizeDegrees(mWaypointBearing));
+
 /*      If a large bearing difference occurs (greater than minimumBearingDelta), then the user has
         passed the start line and the timer should stop*/
-        if(bearingDifference >= minimumBearingDelta){
+        if (bearingDifference >= minimumBearingDelta) {
             return true;
         }
         //The user has not passed the start line even though they are in the start zone.
         return false;
+    }
+
+
+    /*   The bearing returns -180deg to 180deg rather than the standard 0 to 360 degrees
+        Normalizing the value to provide a value east of true north*/
+    protected double normalizeDegrees(double locationBearing) {
+        if (locationBearing >= 0.0 && locationBearing <= 180) {
+            return locationBearing;
+        } else {
+            return 180 + (180 + locationBearing);
+        }
     }
 
     //Fires when the google play location services is connected
