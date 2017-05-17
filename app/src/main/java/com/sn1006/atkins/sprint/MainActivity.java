@@ -361,7 +361,7 @@ public class MainActivity extends FragmentActivity implements
             if (t.getRunning() && mHasLeftZone && isUserPastStartPoint()) {
                 double finishTimeMod = t.finishTimeEstimate(mCurrentLocation, mPreviousLocation);
                 //finishTimeEstimate must be known before startTimeEstimate can be called
-                double startTimeMod = t.startTimeEstimate();
+                double startTimeMod = t.startTimeEstimate(mCurrentLocation, mPreviousLocation);
                 t.stop();
                 mHasLeftZone = false;
                 //Future implementation: timer will be reset here, and first lap saved

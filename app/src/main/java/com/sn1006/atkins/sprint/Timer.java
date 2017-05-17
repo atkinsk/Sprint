@@ -61,6 +61,18 @@ public class Timer {
     }
 
     double finishTimeEstimate(Location currentLocation, Location previousLocation) {
+        finishTimeModifier = gpsTimeEstimateCalc(currentLocation, previousLocation);
+
+        return finishTimeModifier;
+    }
+
+    double startTimeEstimate (Location currentLocation, Location previousLocation) {
+        startTimeModifier = timeBetweenGpsPing - gpsTimeEstimateCalc(currentLocation, previousLocation);
+
+        return startTimeModifier;
+    }
+
+    double gpsTimeEstimateCalc (Location currentLocation, Location previousLocation){
         initialSpeed = previousLocation.getSpeed();
         finalSpeed = currentLocation.getSpeed();
         timeBetweenGpsPing = (currentLocation.getTime()
@@ -70,14 +82,10 @@ public class Timer {
         averageAcceleration = (finalSpeed - initialSpeed) / timeBetweenGpsPing;
         distanceTravelled = previousLocation.distanceTo(currentLocation);
 
-        finishTimeModifier = (-initialSpeed + Math.sqrt((initialSpeed * initialSpeed)
+        double timeModifier = (-initialSpeed + Math.sqrt((initialSpeed * initialSpeed)
                 - (2 * averageAcceleration * (-distanceTravelled))) / averageAcceleration);
 
-        return finishTimeModifier;
+        return timeModifier;
     }
 
-    //Assumes finishTimeModifier is already known. Otherwise returns the time between GPS pings
-    double startTimeEstimate () {
-        return startTimeModifier = timeBetweenGpsPing - finishTimeModifier;
-    }
 }
