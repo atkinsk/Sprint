@@ -17,10 +17,7 @@ public class Timer {
     private double finalSpeed; //m/s
     private double averageAcceleration; //m/s^2
     private double timeBetweenGpsPing; //seconds
-    private double finishTimeModifier; //seconds
-    private double startTimeModifier; //seconds
-
-
+    private double finishTimeModifier = 0; //seconds
 
     public void start() {
         this.startTime = System.currentTimeMillis();
@@ -68,12 +65,6 @@ public class Timer {
         finishTimeModifier = gpsTimeEstimateCalc(currentLocation, previousLocation);
 
         return finishTimeModifier;
-    }
-
-    double startTimeEstimate (Location currentLocation, Location previousLocation) {
-        startTimeModifier = timeBetweenGpsPing - gpsTimeEstimateCalc(currentLocation, previousLocation);
-
-        return startTimeModifier;
     }
 
     double gpsTimeEstimateCalc (Location currentLocation, Location previousLocation){

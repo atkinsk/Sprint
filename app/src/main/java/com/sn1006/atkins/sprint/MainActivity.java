@@ -104,7 +104,7 @@ public class MainActivity extends FragmentActivity implements
     protected Handler handler = new Handler();
 
     //create a session object to store laptimes ------- TO BE MODIFIED IN FUTURE WHEN MULTIPLE SESSIONS EXIST
-    Session mySession = new Session("Test Track", "Fettle");
+    Session mySession = new Session("Test Track", "Fettel");
 
     //Fires when the system first creates the Main Activity
     @Override
@@ -128,8 +128,8 @@ public class MainActivity extends FragmentActivity implements
         updateValuesFromBundle(savedInstanceState);
 
         //pre-defined waypoint x and y coords for testing
-        double kevX = 45.293571;
-        double kevY = -75.856400;
+        double kevX = 45.293715;
+        double kevY = -75.856780;
         double jonX = 45.360282;
         double jonY = -75.750125;
         double watGlenX = 42.341043;
@@ -139,11 +139,11 @@ public class MainActivity extends FragmentActivity implements
         mWaypoint.setLatitude(kevX);
         mWaypoint.setLongitude(kevY);
 
-*/
+
         //create Location object for jon's house start/stop
-        mWaypoint.setLatitude(jonX);
-        mWaypoint.setLongitude(jonY);
-//*/
+        //mWaypoint.setLatitude(jonX);
+        //mWaypoint.setLongitude(jonY);
+
 
         //implement continuously updating timer
         //human eye can register only as fast as every 30ms... so that's how often we will update
@@ -374,7 +374,6 @@ public class MainActivity extends FragmentActivity implements
             if (t.getRunning() && mHasLeftZone && isUserPastStartPoint()) {
                 double finishTimeMod = t.finishTimeEstimate(mCurrentLocation, mPreviousLocation);
                 //finishTimeEstimate must be known before startTimeEstimate can be called
-                double startTimeMod = t.startTimeEstimate(mCurrentLocation, mPreviousLocation);
                 t.stop();
                 mHasLeftZone = false;
                 //Lap done, record it!
