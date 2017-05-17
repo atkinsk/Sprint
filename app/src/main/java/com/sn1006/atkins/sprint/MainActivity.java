@@ -2,6 +2,7 @@ package com.sn1006.atkins.sprint;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
@@ -15,6 +16,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -487,6 +489,14 @@ public class MainActivity extends FragmentActivity implements
     @Override
     public void run() {
         mTimerText.setText("RUNNING");
+    }
+
+    //method to call intent to create LapListActivity when button is clicked
+    public void viewLaptimes(View view) {
+        Context context = this;
+        Class destinationClass = LapListActivity.class;
+        Intent intentToStartDetailActivity = new Intent(context, destinationClass);
+        startActivity(intentToStartDetailActivity);
     }
 }
 
