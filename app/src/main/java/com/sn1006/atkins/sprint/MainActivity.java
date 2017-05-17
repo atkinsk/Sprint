@@ -74,7 +74,7 @@ public class MainActivity extends FragmentActivity implements
 
     //set size of zone for testing waypoint arrival/departure
 
-    protected double mZoneSize = 15; //meters
+    protected double mZoneSize = 30; //meters
     protected boolean mIsInZone = false; //User is in the above listed radius in relation to start zone
     protected boolean mHasLeftZone = false; //User has left the start zone after triggering the timer
 
@@ -116,12 +116,12 @@ public class MainActivity extends FragmentActivity implements
         updateValuesFromBundle(savedInstanceState);
 
         //pre-defined waypoint x and y coords for testing
-        double kevX = 45.293531;
-        double kevY = -75.856726;
+        double kevX = 45.293571;
+        double kevY = -75.856400;
         double jonX = 45.360282;
         double jonY = -75.750125;
-        double watGlenX = 42.341040;
-        double watGlenY = -76.928847;
+        double watGlenX = 42.341043;
+        double watGlenY = -76.928892;
 
         //create Location object for start/stop point
         mWaypoint.setLatitude(kevX);
@@ -309,7 +309,7 @@ public class MainActivity extends FragmentActivity implements
             ActivityCompat.requestPermissions(MainActivity.this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
-            }
+        }
         mRequestingLocationUpdates = true;
     }
 
@@ -341,6 +341,7 @@ public class MainActivity extends FragmentActivity implements
     }
 
     protected void isUserInStartZone() {
+
         //Checks to see if the user is in the specified radius near the start / end point
         if (mDistanceFromWaypoint < mZoneSize) {
             //The user is in the zone
@@ -348,6 +349,7 @@ public class MainActivity extends FragmentActivity implements
 
             //Calculates the bearings of the user's current location relative to the start point
             mWaypointBearing = mCurrentLocation.bearingTo(mWaypoint);
+            mPreviousWaypointBearing = mPreviousLocation.bearingTo(mWaypoint);
             //When the timer is not running, start the timer
             if (!t.getRunning()) {
                 t.start();
@@ -369,7 +371,6 @@ public class MainActivity extends FragmentActivity implements
             mIsInZone = false;
             mHasLeftZone = true;
         }
-        mPreviousWaypointBearing = mWaypointBearing;
     }
 
     //Determines if the user has past the start / end point
@@ -435,7 +436,7 @@ public class MainActivity extends FragmentActivity implements
         //This will allow for distance calculations between the last and current gps coordinates
         mPreviousLocation = mCurrentLocation;
         mCurrentLocation = location;
-                    //This causes the app to crash during first permission checks
+        //This causes the app to crash during first permission checks
                    /* //Distance from current location to previous location
                     mDistanceTravelled = mCurrentLocation.distanceTo(mPreviousLocation);*/
         //Distance from current location to waypoint location
