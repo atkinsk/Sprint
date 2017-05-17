@@ -1,14 +1,25 @@
 package com.sn1006.atkins.sprint;
 
+import android.location.Location;
+
 /**
  * Created by jonathanbrooks on 2017-05-07.
+ * Class to organize all timer logic
  */
 
 public class Timer {
 
-    private long startTime = 0;
-    private long stopTime = 0;
+    private long startTime = 0; //seconds
+    private long stopTime = 0; //seconds
     private boolean running = false;
+    private double distanceTravelled; //meters
+    private double initialSpeed; // m/s
+    private double finalSpeed; //m/s
+    private double averageAcceleration; //m/s^2
+    private double timeBetweenGpsPing; //seconds
+    private double finishTimeModifier; //seconds
+    private double startTimeModifier; //seconds
+
 
 
     public void start() {
@@ -52,4 +63,33 @@ public class Timer {
         return ("Time: " + String.format("%02d",mins) + ":" + String.format("%02d",secs) + ":"
                 + String.format("%02d",millis));
     }
+
+    double finishTimeEstimate(Location currentLocation, Location previousLocation) {
+        finishTimeModifier = gpsTimeEstimateCalc(currentLocation, previousLocation);
+
+        return finishTimeModifier;
+    }
+
+    double startTimeEstimate (Location currentLocation, Location previousLocation) {
+        startTimeModifier = timeBetweenGpsPing - gpsTimeEstimateCalc(currentLocation, previousLocation);
+
+        return startTimeModifier;
+    }
+
+    double gpsTimeEstimateCalc (Location currentLocation, Location previousLocation){
+        initialSpeed = previousLocation.getSpeed();
+        finalSpeed = currentLocation.getSpeed();
+        timeBetweenGpsPing = (currentLocation.getTime()
+                - previousLocation.getTime()) / 1000;
+        //Acceleration is approximated using parameters from Location Services.
+        //Consider using API level 17 to avoid using getTime.. Not always accurate
+        averageAcceleration = (finalSpeed - initialSpeed) / timeBetweenGpsPing;
+        distanceTravelled = previousLocation.distanceTo(currentLocation);
+
+        double timeModifier = (-initialSpeed + Math.sqrt((initialSpeed * initialSpeed)
+                - (2 * averageAcceleration * (-distanceTravelled))) / averageAcceleration);
+
+        return timeModifier;
+    }
+
 }
