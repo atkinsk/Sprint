@@ -35,6 +35,11 @@ public class Waypoint {
         return yCoord;
     }
 
+    //function to change name of a waypoint (for future use)
+    public void setName(String newName) {
+        this.name = newName;
+    }
+
     public String getName() {
         return name;
     }

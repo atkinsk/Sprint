@@ -2,6 +2,7 @@ package com.sn1006.atkins.sprint;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
@@ -15,6 +16,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -74,6 +76,7 @@ public class MainActivity extends FragmentActivity implements
 
     //set size of zone for testing waypoint arrival/departure
 
+
     protected double mZoneSize = 30; //meters
     protected boolean mIsInZone = false; //User is in the above listed radius in relation to start zone
     protected boolean mHasLeftZone = false; //User has left the start zone after triggering the timer
@@ -83,6 +86,9 @@ public class MainActivity extends FragmentActivity implements
     protected TextView mTimerText;
     protected TextView mBearingToWaypointText;
     protected TextView mDistanceFromWaypointText;
+
+    //TEMPORARY TEXTVIEW FOR TESTING PURPOSES - FUTURE WILL BE ON SEPARATE ACTIVITY
+    protected TextView mLaptimesText;
 
 
     protected double mDistanceTravelled; //meters
@@ -97,6 +103,9 @@ public class MainActivity extends FragmentActivity implements
     //handler for timer
     protected Handler handler = new Handler();
 
+    //create a session object to store laptimes ------- TO BE MODIFIED IN FUTURE WHEN MULTIPLE SESSIONS EXIST
+    Session mySession = new Session("Test Track", "Fettle");
+
     //Fires when the system first creates the Main Activity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,6 +119,9 @@ public class MainActivity extends FragmentActivity implements
         mZoneStatusText = (TextView) findViewById(R.id.zoneStatus);
         mTimerText = (TextView) findViewById(R.id.timer);
         mBearingToWaypointText = (TextView) findViewById(R.id.bearingToWaypoint);
+
+        //AGAIN, THIS IS A TEMP TEXT VIEW TO BE REMOVED ONCE LAPTIMES HAS ITS OWN ACTIVITY
+        mLaptimesText = (TextView) findViewById(R.id.showLaptimes);
 
         mRequestingLocationUpdates = false;
 
@@ -127,13 +139,13 @@ public class MainActivity extends FragmentActivity implements
         mWaypoint.setLatitude(kevX);
         mWaypoint.setLongitude(kevY);
 
-/*
+*/
         //create Location object for jon's house start/stop
         mWaypoint.setLatitude(jonX);
         mWaypoint.setLongitude(jonY);
-*/
+//*/
 
-        //let's see if we can get the timer working continuously....
+        //implement continuously updating timer
         //human eye can register only as fast as every 30ms... so that's how often we will update
         //use an event handler to schedule the posting of the time at delayed intervals (30ms)
         //implement runnable interface to set the text
@@ -357,6 +369,7 @@ public class MainActivity extends FragmentActivity implements
             //When the timer is running the timer will be stopped if and only if the user has
             //already left the start zone and returned to it. This keeps the timer from stopping
             //if the GPS coordinates of the user are in the start zone for two GPS pings
+
             //Also checks to see if the user has crossed the start point via bearings delta
             if (t.getRunning() && mHasLeftZone && isUserPastStartPoint()) {
                 double finishTimeMod = t.finishTimeEstimate(mCurrentLocation, mPreviousLocation);
@@ -364,7 +377,17 @@ public class MainActivity extends FragmentActivity implements
                 double startTimeMod = t.startTimeEstimate(mCurrentLocation, mPreviousLocation);
                 t.stop();
                 mHasLeftZone = false;
-                //Future implementation: timer will be reset here, and first lap saved
+                //Lap done, record it!
+                /*--------------------------------------------------------------------------
+                ** CURRENTLY RECORDING LAPTIMES IN A SESSION CREATED IN ONCREATE()
+                ** IN FUTURE THERE WILL BE MULTIPLE SESSIONS...
+                ** SO WE WILL HAVE AN OBJECT THAT HOLDS A LIST OF SESSIONS (HASHMAP?)
+                ** AND WILL HAVE TO ADD IT TO THE PROPER SESSION
+                **--------------------------------------------------------------------------
+                 */
+                mySession.addLap(t.getLaptime());
+                //update laptimes textview with a list of the session's laptimes
+                mLaptimesText.setText(mySession.toString());
             }
         } else {
             //The user has left the zone
@@ -485,6 +508,14 @@ public class MainActivity extends FragmentActivity implements
     @Override
     public void run() {
         mTimerText.setText("RUNNING");
+    }
+
+    //method to call intent to create LapListActivity when button is clicked
+    public void viewLaptimes(View view) {
+        Context context = this;
+        Class destinationClass = LapListActivity.class;
+        Intent intentToStartDetailActivity = new Intent(context, destinationClass);
+        startActivity(intentToStartDetailActivity);
     }
 }
 
