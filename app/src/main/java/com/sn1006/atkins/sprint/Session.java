@@ -1,6 +1,8 @@
 package com.sn1006.atkins.sprint;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Created by jonathanbrooks on 2017-05-13.
@@ -16,15 +18,19 @@ import java.util.ArrayList;
 public class Session {
 
     private String trackname;
-    private String driver;
+    private String driver; //for future use
     private long bestLap;
     public ArrayList<Long> laptimes;
 
+    //for date-time stamping session
+    Calendar c;
+    private Date dateStamp;
+
     //session needs an id (date/timestamp) to differentiate it
-    public Session(String aTrack, String aDriver) {
-        this.trackname = aTrack;
-        this.driver = aDriver;
+    public Session() {
+        this.trackname = "Watkins Glen International";
         this.laptimes = new ArrayList<Long>();
+        this.dateStamp = c.getInstance().getTime();
     }
 
     //add a lap to the session
@@ -74,6 +80,6 @@ public class Session {
 
         }
 
-        return this.driver + "'s session laptimes at " + this.trackname + "\n" + laptimesAsString;
+        return this.trackname + " - " + this.dateStamp + "\n" + laptimesAsString;
     }
 }

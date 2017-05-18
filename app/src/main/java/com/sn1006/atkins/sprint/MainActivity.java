@@ -104,7 +104,7 @@ public class MainActivity extends FragmentActivity implements
     protected Handler handler = new Handler();
 
     //create a session object to store laptimes ------- TO BE MODIFIED IN FUTURE WHEN MULTIPLE SESSIONS EXIST
-    Session mySession = new Session("Test Track", "Fettel");
+    Session mySession = new Session();
 
     //Fires when the system first creates the Main Activity
     @Override
