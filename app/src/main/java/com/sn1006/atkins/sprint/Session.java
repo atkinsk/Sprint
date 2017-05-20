@@ -16,14 +16,13 @@ import java.util.ArrayList;
 public class Session {
 
     private String trackname;
-    private String driver;
     private long bestLap;
+
     public ArrayList<Long> laptimes;
 
     //session needs an id (date/timestamp) to differentiate it
-    public Session(String aTrack, String aDriver) {
+    public Session(String aTrack) {
         this.trackname = aTrack;
-        this.driver = aDriver;
         this.laptimes = new ArrayList<Long>();
     }
 
@@ -42,6 +41,11 @@ public class Session {
         if (laptime < this.bestLap) {
             this.bestLap = laptime;
         }
+    }
+
+    //return best lap
+    public String getBestLap() {
+        return "" + this.bestLap;
     }
 
     //takes laptime from Long format and makes it mm:ss:xx
@@ -74,6 +78,6 @@ public class Session {
 
         }
 
-        return this.driver + "'s session laptimes at " + this.trackname + "\n" + laptimesAsString;
+        return "Your session laptimes at " + this.trackname + "\n" + laptimesAsString;
     }
 }
