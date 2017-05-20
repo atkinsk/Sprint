@@ -4,10 +4,6 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
-
 import com.sn1006.atkins.sprint.data.SessionContract.SessionEntry;
 
 public class SessionDbHelper extends SQLiteOpenHelper {
@@ -24,12 +20,6 @@ public class SessionDbHelper extends SQLiteOpenHelper {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
-    /**
-     * Called when the database is created for the first time. This is where the creation of
-     * tables and the initial population of the tables should happen.
-     *
-     * @param sqLiteDatabase The database.
-     */
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
 
@@ -47,16 +37,11 @@ public class SessionDbHelper extends SQLiteOpenHelper {
                  * named "_ID". We use that here to designate our table's primary key.
                  */
                         SessionEntry._ID               + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-
                         SessionEntry.COLUMN_DATE_TIME  + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +
-
-                        SessionEntry.COLUMN_SESSION_ID + " INTEGER, " +
-
-                        SessionEntry.COLUMN_TRACKNAME  + " TEXT NOT NULL, " +
+                        SessionEntry.COLUMN_TRACKNAME  + " TEXT, " +
                         SessionEntry.COLUMN_DRIVER     + " TEXT, " +
-                        SessionEntry.COLUMN_LAPTIMES   + " TEXT NOT NULL, " +
-
-                        SessionEntry.COLUMN_BESTLAP    + " TEXT NOT NULL, " + ");";
+                        SessionEntry.COLUMN_LAPTIMES   + " TEXT, " +
+                        SessionEntry.COLUMN_BESTLAP    + " TEXT" + ");";
 
         /*
          * After we've spelled out our SQLite table creation statement above, we actually execute

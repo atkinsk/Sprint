@@ -34,15 +34,9 @@ public class SessionContract {
          * offset to this date to get local time at midnight on the appropriate date.
          */
         public static final String COLUMN_DATE_TIME = "datetime";
-
-        public static final String COLUMN_SESSION_ID = "session_id";
-
         public static final String COLUMN_TRACKNAME = "session_trackname";
-
         public static final String COLUMN_DRIVER = "session_driver";
-
         public static final String COLUMN_LAPTIMES = "session_laptimes";
-
         public static final String COLUMN_BESTLAP = "session_bestlap";
 
     }

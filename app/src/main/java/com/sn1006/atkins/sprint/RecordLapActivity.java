@@ -33,6 +33,7 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
+
 import com.sn1006.atkins.sprint.data.SessionContract;
 import com.sn1006.atkins.sprint.data.SessionDbHelper;
 
@@ -86,7 +87,7 @@ public class RecordLapActivity extends AppCompatActivity implements
     protected final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 23;
 
     //set size of zone for testing waypoint arrival/departure
-    protected double mZoneSize = 30; //meters
+    protected double mZoneSize = 7; //meters
     protected boolean mIsInZone = false; //User is in the above listed radius in relation to start zone
     protected boolean mHasLeftZone = false; //User has left the start zone after triggering the timer
 
@@ -140,8 +141,8 @@ public class RecordLapActivity extends AppCompatActivity implements
         double watGlenY = -76.928892;
 
         //create Location object for start/stop point
-        mWaypoint.setLatitude(kevX);
-        mWaypoint.setLongitude(kevY);
+        mWaypoint.setLatitude(jonX);
+        mWaypoint.setLongitude(jonY);
 
 
         //create Location object for jon's house start/stop
@@ -149,7 +150,7 @@ public class RecordLapActivity extends AppCompatActivity implements
         //mWaypoint.setLongitude(jonY);
 
         SessionDbHelper dbHelper = new SessionDbHelper(this);
-        mDb = dbHelper.getWritableDatabase();
+        mDb = dbHelper.getReadableDatabase();
 
         //implement continuously updating timer
         //human eye can register only as fast as every 30ms... so that's how often we will update
@@ -377,7 +378,7 @@ public class RecordLapActivity extends AppCompatActivity implements
             //if the GPS coordinates of the user are in the start zone for two GPS pings
 
             //Also checks to see if the user has crossed the start point via bearings delta
-            if (t.getRunning() && mHasLeftZone && isUserPastStartPoint()) {
+            if (t.getRunning() && mHasLeftZone /*&& isUserPastStartPoint()*/) {
                 double finishTimeMod = t.finishTimeEstimate(mCurrentLocation, mPreviousLocation);
                 //finishTimeEstimate must be known before startTimeEstimate can be called
                 t.stop();

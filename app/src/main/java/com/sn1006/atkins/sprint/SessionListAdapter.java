@@ -1,0 +1,78 @@
+package com.sn1006.atkins.sprint;
+
+import android.content.Context;
+import android.database.Cursor;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+
+import com.sn1006.atkins.sprint.data.SessionContract;
+
+public class SessionListAdapter extends RecyclerView.Adapter<SessionListAdapter.SessionViewHolder> {
+
+    private Context mContext;
+    private Cursor mCursor;
+
+    //uses db cursor
+    public SessionListAdapter(Context context, Cursor cursor) {
+        this.mContext = context;
+        this.mCursor = cursor;
+    }
+
+    @Override
+    public SessionViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        // Get the RecyclerView item layout
+        LayoutInflater inflater = LayoutInflater.from(mContext);
+        View view = inflater.inflate(R.layout.session_list_item, parent, false);
+        return new SessionViewHolder(view);
+    }
+
+    @Override
+    public void onBindViewHolder(SessionViewHolder holder, int position) {
+        // Move the mCursor to the position of the item to be displayed
+        if (!mCursor.moveToPosition(position))
+            return; // bail if returned null
+
+        // Update the view holder with the information needed to display
+        String trackName = mCursor.getString(mCursor.getColumnIndex(SessionContract.SessionEntry.COLUMN_TRACKNAME));
+        String dateStamp = mCursor.getString(mCursor.getColumnIndex(SessionContract.SessionEntry.COLUMN_DATE_TIME));
+
+        String displayName = trackName + ": " + dateStamp;
+        // Display the session name
+        holder.sessionTextView.setText(displayName);
+        holder.sessionTextView.setText(displayName);
+    }
+
+    public void swapCursor(Cursor newCursor) {
+        // Always close the previous mCursor first
+        if (mCursor != null) mCursor.close();
+        // COMPLETED (17) Update the local mCursor to be equal to  newCursor
+        mCursor = newCursor;
+        // COMPLETED (18) Check if the newCursor is not null, and call this.notifyDataSetChanged() if so
+        if (newCursor != null) {
+            // Force the RecyclerView to refresh
+            this.notifyDataSetChanged();
+        }
+    }
+
+    @Override
+    public int getItemCount() {
+
+        return mCursor.getCount();
+    }
+
+    /**
+     * Inner class to hold the views needed to display a single item in the recycler-view
+     */
+    class SessionViewHolder extends RecyclerView.ViewHolder {
+
+        TextView sessionTextView;
+
+        public SessionViewHolder(View itemView) {
+            super(itemView);
+            sessionTextView = (TextView) itemView.findViewById(R.id.session_item);
+        }
+    }
+}
