@@ -2,10 +2,12 @@ package com.sn1006.atkins.sprint;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
+import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
@@ -31,6 +33,8 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
+import com.sn1006.atkins.sprint.data.SessionContract;
+import com.sn1006.atkins.sprint.data.SessionDbHelper;
 
 import android.support.v7.app.AppCompatActivity;
 
@@ -45,6 +49,7 @@ public class RecordLapActivity extends AppCompatActivity implements
     protected GoogleApiClient mGoogleApiClient;
     protected static final String TAG = "MainActivity";
 
+    protected SQLiteDatabase mDb;
 
     //Testing Views / Strings
     protected String mLatitudeLabel = "Lat";
@@ -102,7 +107,7 @@ public class RecordLapActivity extends AppCompatActivity implements
     protected Handler handler = new Handler();
 
     //create a session object to store laptimes ------- TO BE MODIFIED IN FUTURE WHEN MULTIPLE SESSIONS EXIST
-    Session mySession = new Session("Test Track");
+    Session mySession = new Session();
 
 
     @Override
@@ -143,6 +148,8 @@ public class RecordLapActivity extends AppCompatActivity implements
         //mWaypoint.setLatitude(jonX);
         //mWaypoint.setLongitude(jonY);
 
+        SessionDbHelper dbHelper = new SessionDbHelper(this);
+        mDb = dbHelper.getWritableDatabase();
 
         //implement continuously updating timer
         //human eye can register only as fast as every 30ms... so that's how often we will update
@@ -509,10 +516,28 @@ public class RecordLapActivity extends AppCompatActivity implements
         mTimerText.setText("RUNNING");
     }
 
+
+    //button functionality
     protected void viewLapTimes(View view) {
+        //add session to database
+        addNewSession();
+
+        //takes user to laplist
         Context context = this;
         Class destinationClass = LapListActivity.class;
         Intent intentToStartDetailActivity = new Intent(context, destinationClass);
         startActivity(intentToStartDetailActivity);
+    }
+
+    private long addNewSession() {
+        ContentValues cv = new ContentValues();
+
+        cv.put(SessionContract.SessionEntry.COLUMN_TRACKNAME, mySession.getTrackName());
+        cv.put(SessionContract.SessionEntry.COLUMN_DRIVER, mySession.getDriver());
+        cv.put(SessionContract.SessionEntry.COLUMN_BESTLAP, mySession.getBestLap());
+        cv.put(SessionContract.SessionEntry.COLUMN_LAPTIMES, mySession.getLaptimesAsString());
+
+        //insert query
+        return mDb.insert(SessionContract.SessionEntry.TABLE_NAME, null, cv);
     }
 }
