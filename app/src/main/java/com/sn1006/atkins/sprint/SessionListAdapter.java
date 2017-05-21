@@ -10,6 +10,8 @@ import android.widget.TextView;
 
 import com.sn1006.atkins.sprint.data.SessionContract;
 
+import org.w3c.dom.Text;
+
 public class SessionListAdapter extends RecyclerView.Adapter<SessionListAdapter.SessionViewHolder> {
 
     private Context mContext;
@@ -38,11 +40,11 @@ public class SessionListAdapter extends RecyclerView.Adapter<SessionListAdapter.
         // Update the view holder with the information needed to display
         String trackName = mCursor.getString(mCursor.getColumnIndex(SessionContract.SessionEntry.COLUMN_TRACKNAME));
         String dateStamp = mCursor.getString(mCursor.getColumnIndex(SessionContract.SessionEntry.COLUMN_DATE_TIME));
+        String driverName = mCursor.getString(mCursor.getColumnIndex(SessionContract.SessionEntry.COLUMN_DRIVER));
 
-        String displayName = trackName + ": " + dateStamp;
-        // Display the session name
-        holder.sessionTextView.setText(displayName);
-        holder.sessionTextView.setText(displayName);
+        holder.driverNameTextView.setText(driverName);
+        holder.dateTimeTextView.setText(dateStamp);
+        holder.sessionNameTextView.setText(trackName);
     }
 
     public void swapCursor(Cursor newCursor) {
@@ -68,11 +70,15 @@ public class SessionListAdapter extends RecyclerView.Adapter<SessionListAdapter.
      */
     class SessionViewHolder extends RecyclerView.ViewHolder {
 
-        TextView sessionTextView;
+        TextView driverNameTextView;
+        TextView dateTimeTextView;
+        TextView sessionNameTextView;
 
         public SessionViewHolder(View itemView) {
             super(itemView);
-            sessionTextView = (TextView) itemView.findViewById(R.id.session_item);
+            driverNameTextView = (TextView) itemView.findViewById(R.id.driverName);
+            dateTimeTextView = (TextView) itemView.findViewById(R.id.dateTime);
+            sessionNameTextView = (TextView) itemView.findViewById(R.id.sessionName);
         }
     }
 }

@@ -1,15 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="64dp"
+    android:background="@color/colorBackground"
     tools:context="com.sn1006.atkins.sprint.SessionListActivity">
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/floatingActionButton6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:onClick="recordLap"
+        app:fabSize="normal"
+        app:srcCompat="@drawable/road"
+        app:backgroundTint="@color/colorPrimary"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginRight="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="16dp"
+
+ />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/all_session_list_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_width="366dp"
+        android:layout_height="600dp"
+        android:layout_marginLeft="0dp"
+        android:layout_marginTop="0dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-</LinearLayout>
+
+</android.support.constraint.ConstraintLayout>

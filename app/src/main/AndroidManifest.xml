@@ -20,28 +20,23 @@
         </activity>
         <activity
             android:name=".LapListActivity"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".SessionListActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
+                android:value=".SessionListActivity" />
         </activity>
         <activity
             android:name=".RecordLapActivity"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".SessionListActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
+                android:value=".SessionListActivity" />
         </activity>
         <activity
-            android:name=".SessionListActivity"
-            android:parentActivityName=".MainActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
+            android:name=".SessionListActivity">
         </activity>
         <activity android:name=".SplashScreenActivity"
             android:theme="@style/Theme.AppCompat.NoActionBar">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

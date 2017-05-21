@@ -87,7 +87,7 @@ public class RecordLapActivity extends AppCompatActivity implements
     protected final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 23;
 
     //set size of zone for testing waypoint arrival/departure
-    protected double mZoneSize = 7; //meters
+    protected double mZoneSize = 27; //meters
     protected boolean mIsInZone = false; //User is in the above listed radius in relation to start zone
     protected boolean mHasLeftZone = false; //User has left the start zone after triggering the timer
 
@@ -141,8 +141,8 @@ public class RecordLapActivity extends AppCompatActivity implements
         double watGlenY = -76.928892;
 
         //create Location object for start/stop point
-        mWaypoint.setLatitude(jonX);
-        mWaypoint.setLongitude(jonY);
+        mWaypoint.setLatitude(kevX);
+        mWaypoint.setLongitude(kevY);
 
 
         //create Location object for jon's house start/stop

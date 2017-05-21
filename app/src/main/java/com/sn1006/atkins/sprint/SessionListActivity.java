@@ -50,4 +50,11 @@ public class SessionListActivity extends AppCompatActivity {
                 SessionContract.SessionEntry.COLUMN_DATE_TIME
         );
     }
+
+    protected void recordLap(View view){
+        Context context = this;
+        Class destinationClass = RecordLapActivity.class;
+        Intent intentToStartDetailActivity = new Intent (context, destinationClass);
+        startActivity(intentToStartDetailActivity);
+    }
 }
