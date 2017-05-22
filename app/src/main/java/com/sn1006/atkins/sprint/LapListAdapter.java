@@ -33,18 +33,22 @@ public class LapListAdapter extends RecyclerView.Adapter<LapListAdapter.LapViewH
 
     @Override
     public void onBindViewHolder(LapListAdapter.LapViewHolder holder, int position) {
-
+        //Get the lap time at the position in the arraylist
         long singleLap = mListOfLaps.get(position);
 
+        //If the lap time is greater than 0, returns the specific value. formatting the laptime
+        //was crashing if handed a value of 0
         if(singleLap > 0) {
             holder.lapTimeTextView.setText(String.valueOf(formatLaptime(singleLap)));
             holder.lapNumberTextView.setText(String.valueOf(position+1) + ". ");
         }else{
-            holder.lapTimeTextView.setText("No laps to show");
+            holder.lapNumberTextView.setText(String.valueOf(position+1) + ". ");
+            holder.lapTimeTextView.setText("00:00:00");
         }
 
     }
-
+    //Since an ArrayList is required, need to know the size of the arraylist to let the adapter
+    //know how many positions to cycle through in onBindViewHolder
     @Override
     public int getItemCount() {
         return mListOfLaps.size();

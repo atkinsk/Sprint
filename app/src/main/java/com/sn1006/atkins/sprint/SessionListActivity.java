@@ -13,7 +13,9 @@ import android.view.View;
 import com.sn1006.atkins.sprint.data.SessionContract;
 import com.sn1006.atkins.sprint.data.SessionDbHelper;
 
-public class SessionListActivity extends AppCompatActivity {
+
+//Implements interface from SessionListAdapter to handle clicks on the recyclerview views
+public class SessionListActivity extends AppCompatActivity implements SessionListAdapter.SessionAdapterOnClickHandler {
 
     private SessionListAdapter mAdapter;
     private SQLiteDatabase mDb;
@@ -23,8 +25,9 @@ public class SessionListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_session_list);
 
-        RecyclerView sessionRecyclerView;
 
+        //Initiation of the recyclerview for the session list
+        RecyclerView sessionRecyclerView;
         sessionRecyclerView = (RecyclerView) this.findViewById(R.id.all_session_list_view);
         sessionRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
@@ -32,13 +35,15 @@ public class SessionListActivity extends AppCompatActivity {
 
         mDb = dbHelper.getReadableDatabase();
 
+        //Pulls the session list from the database (readable)
         Cursor cursor = getSessionList();
 
-        mAdapter = new SessionListAdapter(this, cursor);
-
+        //Initiates and sets the SessionListAdapter for the recyclerview
+        mAdapter = new SessionListAdapter(this, cursor, this);
         sessionRecyclerView.setAdapter(mAdapter);
     }
 
+    //Query for retrieving the sessionlist
     protected Cursor getSessionList() {
         return mDb.query(
                 SessionContract.SessionEntry.TABLE_NAME,
@@ -51,10 +56,25 @@ public class SessionListActivity extends AppCompatActivity {
         );
     }
 
+    //Intent for the floating action button to begin recording a lap
     protected void recordLap(View view){
         Context context = this;
         Class destinationClass = RecordLapActivity.class;
         Intent intentToStartDetailActivity = new Intent (context, destinationClass);
+        startActivity(intentToStartDetailActivity);
+    }
+
+    //When an item from the recyclerview is clicked, an intent is sent with data on which
+    //item index was selected. This allows the LapListActivity to show the laps
+    //for the session in question
+    //NOTE: If ordering is applied to SessionListActivity, an DB ID will need to be used instead
+    @Override
+    public void onClick(int clickedItemIndex) {
+        Context context = this;
+        Class destinationClass = LapListActivity.class;
+        Intent intentToStartDetailActivity = new Intent(context, destinationClass);
+        String s = String.valueOf(clickedItemIndex);
+        intentToStartDetailActivity.putExtra(Intent.EXTRA_TEXT, s);
         startActivity(intentToStartDetailActivity);
     }
 }
