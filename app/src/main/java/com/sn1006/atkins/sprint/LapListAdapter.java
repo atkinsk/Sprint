@@ -14,14 +14,13 @@ import java.util.ArrayList;
 
 public class LapListAdapter extends RecyclerView.Adapter<LapListAdapter.LapViewHolder> {
     private Context mContext;
-    private Cursor mCursor;
     private ArrayList<Long> mListOfLaps = new ArrayList<Long>();
 
 
     //uses db cursor
-    public LapListAdapter(Context context, Cursor cursor) {
+    public LapListAdapter(Context context, ArrayList<Long> laps) {
         this.mContext = context;
-        this.mCursor = cursor;
+        this.mListOfLaps = laps;
     }
 
     @Override
@@ -34,48 +33,21 @@ public class LapListAdapter extends RecyclerView.Adapter<LapListAdapter.LapViewH
 
     @Override
     public void onBindViewHolder(LapListAdapter.LapViewHolder holder, int position) {
-        // Move the mCursor to the position of the item to be displayed
-        if (!mCursor.moveToPosition(position))
-            return; // bail if returned null
 
-        // Update the view holder with the information needed to display
+        long singleLap = mListOfLaps.get(position);
 
-/*        String lapTimes = mCursor.getString(mCursor.getColumnIndex(SessionContract.SessionEntry.COLUMN_LAPTIMES));
-        if(!lapTimes.equals("")){
-            convertStringToArray(lapTimes);
-            long lap = mListOfLaps.get(position);
-            holder.lapTimeTextView.setText(String.valueOf(formatLaptime(lap)));
-        }else{
-            holder.lapTimeTextView.setText("No laps to show");
-        }*/
-
-        String lapTimes = mCursor.getString(mCursor.getColumnIndex(SessionContract.SessionEntry.COLUMN_LAPTIMES));
-        if(!lapTimes.equals("")){
-            convertStringToArray(lapTimes);
-            for (long x : mListOfLaps){
-                holder.lapTimeTextView.setText(String.valueOf(formatLaptime(x)));
-            }
+        if(singleLap > 0) {
+            holder.lapTimeTextView.setText(String.valueOf(formatLaptime(singleLap)));
+            holder.lapNumberTextView.setText(String.valueOf(position+1) + ". ");
         }else{
             holder.lapTimeTextView.setText("No laps to show");
         }
 
-    }
-
-    public void swapCursor(Cursor newCursor) {
-        // Always close the previous mCursor first
-        if (mCursor != null) mCursor.close();
-        // COMPLETED (17) Update the local mCursor to be equal to  newCursor
-        mCursor = newCursor;
-        // COMPLETED (18) Check if the newCursor is not null, and call this.notifyDataSetChanged() if so
-        if (newCursor != null) {
-            // Force the RecyclerView to refresh
-            this.notifyDataSetChanged();
-        }
     }
 
     @Override
     public int getItemCount() {
-        return mCursor.getCount();
+        return mListOfLaps.size();
     }
 
     /**
@@ -84,17 +56,13 @@ public class LapListAdapter extends RecyclerView.Adapter<LapListAdapter.LapViewH
     class LapViewHolder extends RecyclerView.ViewHolder {
 
         TextView lapTimeTextView;
+        TextView lapNumberTextView;
 
         public LapViewHolder(View itemView) {
             super(itemView);
             lapTimeTextView = (TextView) itemView.findViewById(R.id.lapTime);
+            lapNumberTextView = (TextView) itemView.findViewById(R.id.lapNumber);
 
-        }
-    }
-
-    public void convertStringToArray(String str){
-        for(String s : str.split(",")){
-            mListOfLaps.add(Long.parseLong(s));
         }
     }
 

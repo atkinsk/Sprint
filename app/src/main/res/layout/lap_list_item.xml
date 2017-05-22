@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="106dp"
+    android:layout_height="48dp"
     android:layout_marginTop="8dp"
     android:background="@color/colorAccent"
     android:gravity="center_vertical">
@@ -13,9 +13,25 @@
         android:id="@+id/lapTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="TextView"
-        android:layout_marginLeft="8dp"
+        android:text="Lap Time"
+        android:textSize="16sp"
+        app:layout_constraintLeft_toRightOf="@+id/lapNumber"
+        android:layout_marginLeft="24dp"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="8dp" />
+
+    <TextView
+        android:id="@+id/lapNumber"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="X."
+        android:textSize="16sp"
+        android:layout_marginLeft="16dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="8dp" />
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="8dp" />
 </android.support.constraint.ConstraintLayout>
