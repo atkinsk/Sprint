@@ -10,15 +10,21 @@ import android.widget.TextView;
 
 import com.sn1006.atkins.sprint.data.SessionContract;
 
-public class SessionListAdapter extends RecyclerView.Adapter<SessionListAdapter.SessionViewHolder> {
+import org.w3c.dom.Text;
+
+public class SessionListAdapter extends RecyclerView.Adapter<SessionListAdapter.SessionViewHolder>{
 
     private Context mContext;
     private Cursor mCursor;
+    final private SessionAdapterOnClickHandler mClickHandler;
 
-    //uses db cursor
-    public SessionListAdapter(Context context, Cursor cursor) {
+    //Constructor for the adapter. Depending if a item was click, mClickHandler may or may not be
+    //initialized
+    public SessionListAdapter(Context context, Cursor cursor, SessionAdapterOnClickHandler clickHandler){
         this.mContext = context;
         this.mCursor = cursor;
+        mClickHandler = clickHandler;
+
     }
 
     @Override
@@ -38,41 +44,67 @@ public class SessionListAdapter extends RecyclerView.Adapter<SessionListAdapter.
         // Update the view holder with the information needed to display
         String trackName = mCursor.getString(mCursor.getColumnIndex(SessionContract.SessionEntry.COLUMN_TRACKNAME));
         String dateStamp = mCursor.getString(mCursor.getColumnIndex(SessionContract.SessionEntry.COLUMN_DATE_TIME));
+        String driverName = mCursor.getString(mCursor.getColumnIndex(SessionContract.SessionEntry.COLUMN_DRIVER));
+        String listOfLaps = mCursor.getString(mCursor.getColumnIndex(SessionContract.SessionEntry.COLUMN_LAPTIMES));
+        String bestLap = mCursor.getString(mCursor.getColumnIndex(SessionContract.SessionEntry.COLUMN_BESTLAP));
 
-        String displayName = trackName + ": " + dateStamp;
-        // Display the session name
-        holder.sessionTextView.setText(displayName);
-        holder.sessionTextView.setText(displayName);
-    }
-
-    public void swapCursor(Cursor newCursor) {
-        // Always close the previous mCursor first
-        if (mCursor != null) mCursor.close();
-        // COMPLETED (17) Update the local mCursor to be equal to  newCursor
-        mCursor = newCursor;
-        // COMPLETED (18) Check if the newCursor is not null, and call this.notifyDataSetChanged() if so
-        if (newCursor != null) {
-            // Force the RecyclerView to refresh
-            this.notifyDataSetChanged();
-        }
+        holder.driverNameTextView.setText(driverName);
+        holder.dateTimeTextView.setText(dateStamp);
+        holder.sessionNameTextView.setText(trackName);
+        holder.bestLapTextView.setText("Best Lap: " + formatLaptime(Long.parseLong(bestLap)));
     }
 
     @Override
     public int getItemCount() {
-
         return mCursor.getCount();
     }
 
     /**
      * Inner class to hold the views needed to display a single item in the recycler-view
      */
-    class SessionViewHolder extends RecyclerView.ViewHolder {
+    class SessionViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
-        TextView sessionTextView;
+        TextView driverNameTextView;
+        TextView dateTimeTextView;
+        TextView sessionNameTextView;
+        TextView bestLapTextView;
+        TextView numberOfLapsTextView;
 
         public SessionViewHolder(View itemView) {
             super(itemView);
-            sessionTextView = (TextView) itemView.findViewById(R.id.session_item);
+            driverNameTextView = (TextView) itemView.findViewById(R.id.driverName);
+            dateTimeTextView = (TextView) itemView.findViewById(R.id.dateTime);
+            sessionNameTextView = (TextView) itemView.findViewById(R.id.sessionName);
+            numberOfLapsTextView = (TextView) itemView.findViewById(R.id.numOfLaps);
+            bestLapTextView = (TextView) itemView.findViewById(R.id.bestLap);
+            itemView.setOnClickListener(this);
+
         }
+        @Override
+        public void onClick (View v){
+            //When a session item is clicked, get its position and send it to SessionListActivity
+            //to send with the Intent to open LapListActivity
+            int adapterPosition = getAdapterPosition();
+            mClickHandler.onClick(adapterPosition);
+        }
+    }
+
+    public String formatLaptime(Long laptime) {
+        int mins;
+        int secs;
+        int millis;
+
+        mins = (int) (laptime / 60000);
+        secs = (int) (laptime - mins * 60000) / 1000;
+        millis = (int) (laptime - mins * 60000 - secs * 1000);
+
+        return (String.format("%02d", mins) + ":" + String.format("%02d", secs) + ":"
+                + String.format("%02d", millis));
+
+    }
+    //Interface used in SessionListActivity to handle the transfer information about what item was
+    //clicked
+    public interface SessionAdapterOnClickHandler {
+        void onClick (int clickedItemIndex);
     }
 }

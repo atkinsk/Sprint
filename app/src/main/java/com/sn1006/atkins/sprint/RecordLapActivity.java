@@ -87,7 +87,7 @@ public class RecordLapActivity extends AppCompatActivity implements
     protected final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 23;
 
     //set size of zone for testing waypoint arrival/departure
-    protected double mZoneSize = 7; //meters
+    protected double mZoneSize = 29; //meters
     protected boolean mIsInZone = false; //User is in the above listed radius in relation to start zone
     protected boolean mHasLeftZone = false; //User has left the start zone after triggering the timer
 
@@ -141,8 +141,8 @@ public class RecordLapActivity extends AppCompatActivity implements
         double watGlenY = -76.928892;
 
         //create Location object for start/stop point
-        mWaypoint.setLatitude(jonX);
-        mWaypoint.setLongitude(jonY);
+        mWaypoint.setLatitude(kevX);
+        mWaypoint.setLongitude(kevY);
 
 
         //create Location object for jon's house start/stop
@@ -518,18 +518,29 @@ public class RecordLapActivity extends AppCompatActivity implements
     }
 
 
-    //button functionality
+    //"Stop Session" Button. Changes activity to LapListActivity for the current session. Saves
+    //the current session to the database if a lap exists. Returns to main menu if no lap exists
     protected void viewLapTimes(View view) {
-        //add session to database
-        addNewSession();
+        //Checks if a lap exists for the current recording
+        if(!mySession.getLaptimesAsString().equals("")) {
+            //Adds the new session to the database
+            addNewSession();
+            //takes user to laplist
+            Context context = this;
+            Class destinationClass = LapListActivity.class;
+            Intent intentToStartDetailActivity = new Intent(context, destinationClass);
+            startActivity(intentToStartDetailActivity);
+        } else {
+            //Brings user to sessionListActivity and returns a toast to say no laps were recorded
+            //and nothing has been saved to the database
+            returnToSessionList();
 
-        //takes user to laplist
-        Context context = this;
-        Class destinationClass = LapListActivity.class;
-        Intent intentToStartDetailActivity = new Intent(context, destinationClass);
-        startActivity(intentToStartDetailActivity);
+            Toast toast = Toast.makeText(this, "Session not saved - No laps recorded", Toast.LENGTH_LONG);
+            toast.show();
+        }
     }
 
+    //Adds session to the local SQL database
     private long addNewSession() {
         ContentValues cv = new ContentValues();
 
@@ -540,5 +551,13 @@ public class RecordLapActivity extends AppCompatActivity implements
 
         //insert query
         return mDb.insert(SessionContract.SessionEntry.TABLE_NAME, null, cv);
+    }
+
+    //Intent to return the user to the SessionlistActivity
+    protected void returnToSessionList() {
+        Context context = this;
+        Class destinationClass = SessionListActivity.class;
+        Intent intentToStartDetailActivity = new Intent(context, destinationClass);
+        startActivity(intentToStartDetailActivity);
     }
 }
