@@ -41,6 +41,7 @@ public class SessionDbHelper extends SQLiteOpenHelper {
                         SessionEntry.COLUMN_TRACKNAME  + " TEXT, " +
                         SessionEntry.COLUMN_DRIVER     + " TEXT, " +
                         SessionEntry.COLUMN_LAPTIMES   + " TEXT, " +
+                        SessionEntry.COLUMN_NUMBEROFLAPS + " TEXT, " +
                         SessionEntry.COLUMN_BESTLAP    + " TEXT" + ");";
 
         /*

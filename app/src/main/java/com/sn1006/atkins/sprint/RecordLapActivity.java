@@ -548,6 +548,7 @@ public class RecordLapActivity extends AppCompatActivity implements
         cv.put(SessionContract.SessionEntry.COLUMN_DRIVER, mySession.getDriver());
         cv.put(SessionContract.SessionEntry.COLUMN_BESTLAP, mySession.getBestLap());
         cv.put(SessionContract.SessionEntry.COLUMN_LAPTIMES, mySession.getLaptimesAsString());
+        cv.put(SessionContract.SessionEntry.COLUMN_NUMBEROFLAPS, mySession.getNumberOfLaps());
 
         //insert query
         return mDb.insert(SessionContract.SessionEntry.TABLE_NAME, null, cv);

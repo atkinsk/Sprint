@@ -78,6 +78,10 @@ public class Session {
         }
     }
 
+    public String getNumberOfLaps(){
+        return "" + this.laptimes.size();
+    }
+
     //takes laptime from Long format and makes it mm:ss:xx
     public String formatLaptime(Long laptime) {
         int mins;

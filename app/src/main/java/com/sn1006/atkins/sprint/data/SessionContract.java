@@ -37,6 +37,7 @@ public class SessionContract {
         public static final String COLUMN_TRACKNAME = "session_trackname";
         public static final String COLUMN_DRIVER = "session_driver";
         public static final String COLUMN_LAPTIMES = "session_laptimes";
+        public static final String COLUMN_NUMBEROFLAPS = "session_numberoflaps";
         public static final String COLUMN_BESTLAP = "session_bestlap";
 
     }
