@@ -45,12 +45,15 @@ public class SessionListAdapter extends RecyclerView.Adapter<SessionListAdapter.
         String trackName = mCursor.getString(mCursor.getColumnIndex(SessionContract.SessionEntry.COLUMN_TRACKNAME));
         String dateStamp = mCursor.getString(mCursor.getColumnIndex(SessionContract.SessionEntry.COLUMN_DATE_TIME));
         String driverName = mCursor.getString(mCursor.getColumnIndex(SessionContract.SessionEntry.COLUMN_DRIVER));
-        String listOfLaps = mCursor.getString(mCursor.getColumnIndex(SessionContract.SessionEntry.COLUMN_LAPTIMES));
+        String numberOfLaps = mCursor.getString(mCursor.getColumnIndex(SessionContract.SessionEntry.COLUMN_NUMBEROFLAPS));
         String bestLap = mCursor.getString(mCursor.getColumnIndex(SessionContract.SessionEntry.COLUMN_BESTLAP));
+
+
 
         holder.driverNameTextView.setText(driverName);
         holder.dateTimeTextView.setText(dateStamp);
         holder.sessionNameTextView.setText(trackName);
+        holder.numberOfLapsTextView.setText("Total Laps: " + numberOfLaps);
         holder.bestLapTextView.setText("Best Lap: " + formatLaptime(Long.parseLong(bestLap)));
     }
 
