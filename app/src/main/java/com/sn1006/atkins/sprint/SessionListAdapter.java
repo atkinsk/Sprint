@@ -10,13 +10,14 @@ import android.widget.TextView;
 
 import com.sn1006.atkins.sprint.data.SessionContract;
 
-import org.w3c.dom.Text;
+import java.util.ArrayList;
 
 public class SessionListAdapter extends RecyclerView.Adapter<SessionListAdapter.SessionViewHolder>{
 
     private Context mContext;
     private Cursor mCursor;
     final private SessionAdapterOnClickHandler mClickHandler;
+    private ArrayList<Long> mListOfLaps = new ArrayList<Long>();
 
     //Constructor for the adapter. Depending if a item was click, mClickHandler may or may not be
     //initialized
@@ -46,15 +47,19 @@ public class SessionListAdapter extends RecyclerView.Adapter<SessionListAdapter.
         String dateStamp = mCursor.getString(mCursor.getColumnIndex(SessionContract.SessionEntry.COLUMN_DATE_TIME));
         String driverName = mCursor.getString(mCursor.getColumnIndex(SessionContract.SessionEntry.COLUMN_DRIVER));
         String numberOfLaps = mCursor.getString(mCursor.getColumnIndex(SessionContract.SessionEntry.COLUMN_NUMBEROFLAPS));
+        String listOfLapsString = mCursor.getString(mCursor.getColumnIndex(SessionContract.SessionEntry.COLUMN_LAPTIMES));
         String bestLap = mCursor.getString(mCursor.getColumnIndex(SessionContract.SessionEntry.COLUMN_BESTLAP));
 
 
+        convertStringToArray(listOfLapsString);
+        long avgLap = totalSessionTime() / Integer.parseInt(numberOfLaps);
 
         holder.driverNameTextView.setText(driverName);
         holder.dateTimeTextView.setText(dateStamp);
         holder.sessionNameTextView.setText(trackName);
         holder.numberOfLapsTextView.setText("Total Laps: " + numberOfLaps);
         holder.bestLapTextView.setText("Best Lap: " + formatLaptime(Long.parseLong(bestLap)));
+        holder.averageLapTextView.setText("Avg. Lap: " + formatLaptime(avgLap));
     }
 
     @Override
@@ -71,6 +76,7 @@ public class SessionListAdapter extends RecyclerView.Adapter<SessionListAdapter.
         TextView dateTimeTextView;
         TextView sessionNameTextView;
         TextView bestLapTextView;
+        TextView averageLapTextView;
         TextView numberOfLapsTextView;
 
         public SessionViewHolder(View itemView) {
@@ -79,6 +85,7 @@ public class SessionListAdapter extends RecyclerView.Adapter<SessionListAdapter.
             dateTimeTextView = (TextView) itemView.findViewById(R.id.dateTime);
             sessionNameTextView = (TextView) itemView.findViewById(R.id.sessionName);
             numberOfLapsTextView = (TextView) itemView.findViewById(R.id.numOfLaps);
+            averageLapTextView = (TextView) itemView.findViewById(R.id.avgLap);
             bestLapTextView = (TextView) itemView.findViewById(R.id.bestLap);
             itemView.setOnClickListener(this);
 
@@ -90,6 +97,20 @@ public class SessionListAdapter extends RecyclerView.Adapter<SessionListAdapter.
             int adapterPosition = getAdapterPosition();
             mClickHandler.onClick(adapterPosition);
         }
+    }
+
+    public void convertStringToArray(String str) {
+        for (String s : str.split(",")) {
+            mListOfLaps.add(Long.parseLong(s));
+        }
+    }
+
+    public long totalSessionTime(){
+        long totalSessionTime = 0;
+        for(long singleLap : mListOfLaps){
+            totalSessionTime += singleLap;
+        }
+        return totalSessionTime;
     }
 
     public String formatLaptime(Long laptime) {
@@ -110,4 +131,6 @@ public class SessionListAdapter extends RecyclerView.Adapter<SessionListAdapter.
     public interface SessionAdapterOnClickHandler {
         void onClick (int clickedItemIndex);
     }
+
+
 }
