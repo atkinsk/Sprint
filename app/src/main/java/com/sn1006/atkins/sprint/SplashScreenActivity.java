@@ -8,7 +8,7 @@ import android.os.Handler;
 
 public class SplashScreenActivity extends AppCompatActivity {
 
-    private final int SPLASH_DISPLAY_LENGTH = 2000;
+    private final int SPLASH_DISPLAY_LENGTH = 1750;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

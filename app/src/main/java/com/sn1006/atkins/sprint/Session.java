@@ -112,6 +112,6 @@ public class Session {
 
         }
 
-        return this.trackname + " - " + this.dateStamp + "\n" + laptimesAsString;
+        return laptimesAsString;
     }
 }
