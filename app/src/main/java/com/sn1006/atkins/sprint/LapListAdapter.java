@@ -9,8 +9,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.sn1006.atkins.sprint.data.SessionContract;
-
 import java.util.ArrayList;
 
 public class LapListAdapter extends RecyclerView.Adapter<LapListAdapter.LapViewHolder> {
