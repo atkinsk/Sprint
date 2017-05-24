@@ -100,6 +100,7 @@ public class SessionListAdapter extends RecyclerView.Adapter<SessionListAdapter.
     }
 
     public void convertStringToArray(String str) {
+        mListOfLaps.clear();
         for (String s : str.split(",")) {
             mListOfLaps.add(Long.parseLong(s));
         }
