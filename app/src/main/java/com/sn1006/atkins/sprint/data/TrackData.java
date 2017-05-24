@@ -9,10 +9,10 @@ package com.sn1006.atkins.sprint.data;
 public class TrackData {
 
     public static double getLat(String track) {
-        if(track == "wgi") {
+        if(track.equals("wgi")) {
             return 42.341043;
         }
-        else if(track == "test") {
+        else if(track.equals("test")) {
             return 44.708453;
         }
         else {
@@ -21,10 +21,10 @@ public class TrackData {
     }
 
     public static double getLon(String track) {
-        if(track == "wgi") {
+        if(track.equals("wgi")) {
             return -76.928892;
         }
-        else if(track == "test") {
+        else if(track.equals("test")) {
             return -75.856780;
         }
         else {

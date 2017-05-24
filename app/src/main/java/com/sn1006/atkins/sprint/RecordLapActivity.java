@@ -333,8 +333,7 @@ public class RecordLapActivity extends AppCompatActivity implements
                     mCurrentLocation.getLongitude()));
             mNumberUpdatesText.setText(String.format("%s: %f", "# Updates", mNumberUpdates));
             mDistanceFromWaypointText.setText(String.format("%s: %f", "Dist from WP", mDistanceFromWaypoint));
-            //mZoneStatusText.setText("IN THE ZONE? " + mIsInZone);
-            mZoneStatusText.setText(track);
+            mZoneStatusText.setText("IN THE ZONE? " + mIsInZone);
             mBearingToWaypointText.setText("Bearing to WP " + normalizeDegrees(mWaypointBearing));
         }
     }
