@@ -6,6 +6,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
@@ -16,6 +17,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
@@ -44,7 +46,8 @@ public class RecordLapActivity extends AppCompatActivity implements
         OnConnectionFailedListener,
         ConnectionCallbacks,
         LocationListener,
-        Runnable {
+        Runnable,
+        SharedPreferences.OnSharedPreferenceChangeListener {
 
 
     protected GoogleApiClient mGoogleApiClient;
@@ -110,11 +113,22 @@ public class RecordLapActivity extends AppCompatActivity implements
     //create a session object to store laptimes ------- TO BE MODIFIED IN FUTURE WHEN MULTIPLE SESSIONS EXIST
     Session mySession = new Session();
 
+    //variables to be loaded from shared preferences
+    protected String driverName;
+    protected String track;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lap_record);
+
+        //load shared preferences (driver name and track)
+        setupSharedPreferences();
+
+        //now that we have the shared preferences, apply them to the session created
+        mySession.setDriver(driverName);
+        mySession.setTrack(track);
 
         mLatitudeText = (TextView) findViewById(R.id.latitude);
         mLongitudeText = (TextView) findViewById(R.id.longitude);
@@ -144,11 +158,6 @@ public class RecordLapActivity extends AppCompatActivity implements
         mWaypoint.setLatitude(kevX);
         mWaypoint.setLongitude(kevY);
 
-
-        //create Location object for jon's house start/stop
-        //mWaypoint.setLatitude(jonX);
-        //mWaypoint.setLongitude(jonY);
-
         SessionDbHelper dbHelper = new SessionDbHelper(this);
         mDb = dbHelper.getReadableDatabase();
 
@@ -175,6 +184,36 @@ public class RecordLapActivity extends AppCompatActivity implements
         createLocationRequest();
         buildLocationSettingsRequest();
 
+    }
+
+    private void setupSharedPreferences() {
+        //get all the values from the SharedPreferences to use in the session
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+        //set the driver name and track variables using methods below, which are also called from onSharedPreferencesChanged
+        setDriver(sharedPreferences);
+        setTrack(sharedPreferences);
+    }
+
+    private void setDriver(SharedPreferences sharedPreferences) {
+        driverName = sharedPreferences.getString(getString(R.string.pref_driver_key),
+                getString(R.string.pref_driver_default));
+    }
+
+    private void setTrack(SharedPreferences sharedPreferences) {
+        track = sharedPreferences.getString(getString(R.string.pref_track_key),
+                getString(R.string.pref_track_default));
+    }
+
+    // Updates the screen if the shared preferences change. This method is required when you make a
+    // class implement OnSharedPreferenceChangedListener
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (key.equals(getString(R.string.pref_driver_key))) {
+            setDriver(sharedPreferences);
+        } else if (key.equals(getString(R.string.pref_track_key))) {
+            setTrack(sharedPreferences);
+        }
     }
 
     private void updateValuesFromBundle(Bundle savedInstanceState) {

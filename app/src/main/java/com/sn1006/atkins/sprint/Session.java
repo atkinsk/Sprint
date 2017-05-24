@@ -28,10 +28,10 @@ public class Session {
 
     //session needs an id (date/timestamp) to differentiate it
     public Session() {
-        this.trackname = "Watkins Glen International";
+        this.trackname = "@string/pref_track_default";
         this.laptimes = new ArrayList<Long>();
         this.dateStamp = c.getInstance().getTime();
-        this.driver = "Test Driver";
+        this.driver = "@string/pref_driver_default";
     }
 
     public String getBestLap() {
@@ -44,6 +44,14 @@ public class Session {
 
     public String getDriver() {
         return this.driver;
+    }
+
+    public void setDriver(String driverName) {
+        this.driver = driverName;
+    }
+
+    public void setTrack(String track) {
+        this.trackname = track;
     }
 
     public String getLaptimesAsString() {
