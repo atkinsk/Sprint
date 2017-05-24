@@ -38,6 +38,7 @@ import com.google.android.gms.location.LocationSettingsStatusCodes;
 
 import com.sn1006.atkins.sprint.data.SessionContract;
 import com.sn1006.atkins.sprint.data.SessionDbHelper;
+import com.sn1006.atkins.sprint.data.TrackData;
 
 import android.support.v7.app.AppCompatActivity;
 
@@ -155,8 +156,8 @@ public class RecordLapActivity extends AppCompatActivity implements
         double watGlenY = -76.928892;
 
         //create Location object for start/stop point
-        mWaypoint.setLatitude(kevX);
-        mWaypoint.setLongitude(kevY);
+        mWaypoint.setLatitude(TrackData.getLat(track));
+        mWaypoint.setLongitude(TrackData.getLon(track));
 
         SessionDbHelper dbHelper = new SessionDbHelper(this);
         mDb = dbHelper.getReadableDatabase();
@@ -332,7 +333,8 @@ public class RecordLapActivity extends AppCompatActivity implements
                     mCurrentLocation.getLongitude()));
             mNumberUpdatesText.setText(String.format("%s: %f", "# Updates", mNumberUpdates));
             mDistanceFromWaypointText.setText(String.format("%s: %f", "Dist from WP", mDistanceFromWaypoint));
-            mZoneStatusText.setText("IN THE ZONE? " + mIsInZone);
+            //mZoneStatusText.setText("IN THE ZONE? " + mIsInZone);
+            mZoneStatusText.setText(track);
             mBearingToWaypointText.setText("Bearing to WP " + normalizeDegrees(mWaypointBearing));
         }
     }
