@@ -60,10 +60,10 @@ public class Session {
         String lapTimesAsString = "";
 
         for (long x : this.laptimes) {
-            lapTimesAsString += x;
+            lapTimesAsString = lapTimesAsString + String.valueOf(x);
 
             if(this.laptimes.indexOf(x)<this.laptimes.size()-1){
-                lapTimesAsString += x+strSeparator;
+                lapTimesAsString = lapTimesAsString + strSeparator;
             }
         }
         return lapTimesAsString;
@@ -120,6 +120,6 @@ public class Session {
 
         }
 
-        return this.trackname + " - " + this.dateStamp + "\n" + laptimesAsString;
+        return laptimesAsString;
     }
 }

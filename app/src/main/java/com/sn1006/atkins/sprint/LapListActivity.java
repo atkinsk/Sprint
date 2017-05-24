@@ -60,6 +60,7 @@ public class LapListActivity extends AppCompatActivity {
         cursor.moveToFirst();
 
         String laps = cursor.getString(cursor.getColumnIndex(SessionContract.SessionEntry.COLUMN_LAPTIMES));
+        String bestLap = cursor.getString(cursor.getColumnIndex(SessionContract.SessionEntry.COLUMN_BESTLAP));
 
         mSessionNameText = (TextView) findViewById(R.id.lapListHeader);
         mNumberOfLapsText = (TextView) findViewById(R.id.numberOfLaps);
@@ -78,7 +79,7 @@ public class LapListActivity extends AppCompatActivity {
         }
         //Send in ArrayList to Adapter instead of a Cursor. Could not cycle through values in
         //ArrayList otherwise.
-        mAdapter = new LapListAdapter(this, mListOfLaps);
+        mAdapter = new LapListAdapter(this, mListOfLaps, bestLap);
 
         lapRecyclerView.setAdapter(mAdapter);
         /*} else {
@@ -113,14 +114,6 @@ public class LapListActivity extends AppCompatActivity {
             mListOfLaps.add(Long.parseLong(s));
         }
     }
-    //No longer necessary. See comment on convertStringToArray in onCreate method
-/*    protected void returnToSessionList() {
-        Context context = this;
-        Class destinationClass = SessionListActivity.class;
-        Intent intentToStartDetailActivity = new Intent(context, destinationClass);
-        startActivity(intentToStartDetailActivity);
-    }*/
-
 }
 
 

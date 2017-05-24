@@ -1,6 +1,9 @@
 <resources>
+    <!--Labels in manifest folder. Activity titles-->
     <string name="app_name">Sprint LT</string>
-
+    <string name="session_activity">Sessions</string>
+    <string name="lap_activity">Laps</string>
+    <string name="record_activity">Record</string>
     <string name="action_settings">Settings</string>
 
     <!-- - - - - - - - - - - - - - - -

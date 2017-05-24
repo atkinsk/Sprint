@@ -97,39 +97,24 @@
         android:layout_marginBottom="8dp"
         android:layout_marginStart="8dp" />
 
-    <TextView
-        android:id="@+id/showBestLap"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="BEST LAP"
-        android:layout_marginTop="196dp"
-        app:layout_constraintTop_toBottomOf="@+id/timer"
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/stopRecording"
+        android:layout_width="66dp"
+        android:layout_height="70dp"
+        android:backgroundTint="@color/colorPrimary"
+        android:clickable="true"
+        android:onClick="viewLapTimes"
+        app:fabSize="mini"
+        app:srcCompat="@drawable/stop"
         android:layout_marginRight="8dp"
         app:layout_constraintRight_toRightOf="parent"
         android:layout_marginLeft="8dp"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintHorizontal_bias="0.973"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp" />
-
-    <Button
-        android:id="@+id/button4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="STOP SESSION"
-        android:onClick="viewLapTimes"
-        app:layout_constraintLeft_toRightOf="@+id/showLaptimes"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintHorizontal_bias="0.289"
+        app:layout_constraintHorizontal_bias="0.501"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="8dp"
-        app:layout_constraintVertical_bias="0.847"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp" />
+        android:layout_marginBottom="72dp"
+        tools:layout_editor_absoluteY="369dp"
+        tools:layout_editor_absoluteX="163dp" />
 
 
 </android.support.constraint.ConstraintLayout>

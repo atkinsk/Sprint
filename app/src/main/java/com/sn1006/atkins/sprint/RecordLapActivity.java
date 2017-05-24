@@ -97,7 +97,6 @@ public class RecordLapActivity extends AppCompatActivity implements
 
 
     protected TextView mTimerText;
-    protected TextView mShowBestLap;
 
     protected double mDistanceTravelled; //meters
     protected double mDistanceFromWaypoint; //meters
@@ -138,7 +137,6 @@ public class RecordLapActivity extends AppCompatActivity implements
         mZoneStatusText = (TextView) findViewById(R.id.zoneStatus);
         mTimerText = (TextView) findViewById(R.id.timer);
         mBearingToWaypointText = (TextView) findViewById(R.id.bearingToWaypoint);
-        mShowBestLap = (TextView) findViewById(R.id.showBestLap);
 
         //AGAIN, THIS IS A TEMP TEXT VIEW TO BE REMOVED ONCE LAPTIMES HAS ITS OWN ACTIVITY
         mLaptimesText = (TextView) findViewById(R.id.showLaptimes);
@@ -434,7 +432,6 @@ public class RecordLapActivity extends AppCompatActivity implements
                 mySession.addLap(t.getLaptime());
                 //update laptimes textview with a list of the session's laptimes
                 mLaptimesText.setText(mySession.toString());
-                mShowBestLap.setText(mySession.getBestLap());
             }
         } else {
             //The user has left the zone
