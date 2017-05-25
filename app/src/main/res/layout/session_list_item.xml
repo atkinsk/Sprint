@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="106dp"
     android:layout_marginTop="8dp"
-    android:background="@color/colorAccent"
+    android:background="@color/color_title_text"
     android:gravity="center_vertical">
 
 

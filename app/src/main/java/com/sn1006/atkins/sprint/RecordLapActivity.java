@@ -442,7 +442,7 @@ public class RecordLapActivity extends AppCompatActivity implements
 
     //Determines if the user has past the start / end point
     protected boolean isUserPastStartPoint() {
-        int minimumBearingDelta = 105; //degrees
+        int minimumBearingDelta = 70; //degrees
 
         double bearingDifference = Math.abs(normalizeDegrees(mPreviousWaypointBearing)
                 - normalizeDegrees(mWaypointBearing));
@@ -557,7 +557,7 @@ public class RecordLapActivity extends AppCompatActivity implements
 
     //"Stop Session" Button. Changes activity to LapListActivity for the current session. Saves
     //the current session to the database if a lap exists. Returns to main menu if no lap exists
-    protected void viewLapTimes(View view) {
+    public void viewLapTimes(View view) {
         //Checks if a lap exists for the current recording
         if(!mySession.getLaptimesAsString().equals("")) {
             //Adds the new session to the database
@@ -592,7 +592,7 @@ public class RecordLapActivity extends AppCompatActivity implements
     }
 
     //Intent to return the user to the SessionlistActivity
-    protected void returnToSessionList() {
+    public void returnToSessionList() {
         Context context = this;
         Class destinationClass = SessionListActivity.class;
         Intent intentToStartDetailActivity = new Intent(context, destinationClass);

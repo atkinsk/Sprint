@@ -60,7 +60,7 @@ public class SessionListActivity extends AppCompatActivity implements SessionLis
     }
 
     //Intent for the floating action button to begin recording a lap
-    protected void recordLap(View view){
+    public void recordLap(View view){
         Context context = this;
         Class destinationClass = RecordLapActivity.class;
         Intent intentToStartDetailActivity = new Intent (context, destinationClass);
