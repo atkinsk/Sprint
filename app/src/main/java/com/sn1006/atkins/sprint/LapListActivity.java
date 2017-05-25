@@ -114,6 +114,18 @@ public class LapListActivity extends AppCompatActivity {
             mListOfLaps.add(Long.parseLong(s));
         }
     }
+
+    //Brings the user back to the sessionlistactivity instead of the session recording when
+    //pressing the phone's back button in the sessionlistactivity
+    //This is only an issue after just completing a session. Otherwise the back button
+    //will bring the user back to the sessionlistactivity anyway
+    @Override
+    public void onBackPressed() {
+        Context context = this;
+        Class destinationClass = SessionListActivity.class;
+        Intent intentToStartDetailActivity = new Intent(context, destinationClass);
+        startActivity(intentToStartDetailActivity);
+    }
 }
 
 

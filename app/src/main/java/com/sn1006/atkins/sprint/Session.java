@@ -1,5 +1,6 @@
 package com.sn1006.atkins.sprint;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -69,6 +70,9 @@ public class Session {
         return lapTimesAsString;
     }
 
+    public ArrayList <Long> getLapTimesAsArray(){ return this.laptimes;
+    }
+
     //add a lap to the session
     public void addLap(Long laptime) {
         if(laptimes.isEmpty()) {
@@ -121,5 +125,18 @@ public class Session {
         }
 
         return laptimesAsString;
+    }
+
+    public void convertStringToArray(String str) {
+        this.laptimes.clear();
+        if(!str.equals("")) {
+            for (String s : str.split(",")) {
+                this.laptimes.add(Long.parseLong(s));
+            }
+        }
+    }
+
+    public void setBestLap (String bestLap){
+        this.bestLap = Long.parseLong(bestLap);
     }
 }

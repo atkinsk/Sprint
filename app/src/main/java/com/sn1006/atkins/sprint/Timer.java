@@ -11,8 +11,8 @@ import com.google.android.gms.location.LocationListener;
 
 public class Timer {
 
-    private long startTime = 0; //ms
-    private long stopTime = 0; //ms
+    private long startTime; //ms
+    private long stopTime; //ms
     private boolean running = false;
     private double distanceTravelled; //meters
     private double initialSpeed; // m/s
@@ -30,6 +30,13 @@ public class Timer {
     public void stop() {
         this.stopTime = System.currentTimeMillis();
         this.running = false;
+    }
+
+    public Long getStartTime (){return this.startTime;
+    }
+
+    public void setStartTime (long startTime){
+        this.startTime = startTime;
     }
 
     public boolean getRunning() {
