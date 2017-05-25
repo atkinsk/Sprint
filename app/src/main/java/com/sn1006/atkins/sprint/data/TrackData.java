@@ -13,7 +13,7 @@ public class TrackData {
             return 42.341043;
         }
         else if(track.equals("test")) {
-            return 45.317401;
+            return 45.330849;
         }
         else {
             return 0.00;
@@ -25,7 +25,7 @@ public class TrackData {
             return -76.928892;
         }
         else if(track.equals("test")) {
-            return -75.891774;
+            return -75.859829;
         }
         else {
             return 0.00;

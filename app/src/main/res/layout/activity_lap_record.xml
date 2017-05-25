@@ -101,7 +101,7 @@
         android:id="@+id/stopRecording"
         android:layout_width="66dp"
         android:layout_height="70dp"
-        android:backgroundTint="@color/colorPrimary"
+        app:backgroundTint="@color/colorPrimary"
         android:clickable="true"
         android:onClick="viewLapTimes"
         app:fabSize="mini"
@@ -115,6 +115,5 @@
         android:layout_marginBottom="72dp"
         tools:layout_editor_absoluteY="369dp"
         tools:layout_editor_absoluteX="163dp" />
-
 
 </android.support.constraint.ConstraintLayout>

@@ -36,7 +36,7 @@
         </activity>
         <activity
             android:name=".SessionListActivity"
-            android:label="@string/session_activity">
+            android:label="@string/session_activity"
             android:launchMode="singleTop">
         </activity>
         <activity android:name=".SplashScreenActivity"
