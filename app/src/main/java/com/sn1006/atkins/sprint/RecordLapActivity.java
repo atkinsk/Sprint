@@ -175,11 +175,11 @@ public class RecordLapActivity extends AppCompatActivity implements
             mNumberUpdates = savedInstanceState.getDouble(NUMOFUPDATES_TEXT_KEY);
             mySession.convertStringToArray(savedInstanceState.getString(LAPTIMES_TEXT_KEY));
             mySession.setBestLap(savedInstanceState.getString(BESTLAP_TEXT_KEY));
-            if(savedInstanceState.containsKey(STARTTIME_TEXT_KEY)){
+            if (savedInstanceState.containsKey(STARTTIME_TEXT_KEY)) {
                 t.start();
                 t.setStartTime(savedInstanceState.getLong(STARTTIME_TEXT_KEY));
                 mTimerText.setText(t.getElapsedTime());
-                handler.postDelayed(updater,30);
+                handler.postDelayed(updater, 30);
             }
         }
     }
@@ -204,7 +204,7 @@ public class RecordLapActivity extends AppCompatActivity implements
         outState.putDouble(NUMOFUPDATES_TEXT_KEY, mNumberUpdates);
         outState.putString(LAPTIMES_TEXT_KEY, mySession.getLaptimesAsString());
         outState.putString(BESTLAP_TEXT_KEY, mySession.getBestLap());
-        if(t.getRunning()){
+        if (t.getRunning()) {
             outState.putLong(STARTTIME_TEXT_KEY, t.getStartTime());
         }
     }
@@ -613,16 +613,9 @@ public class RecordLapActivity extends AppCompatActivity implements
     @Override
     protected void onStart() {
         super.onStart();
-        mGoogleApiClient.connect();
-    }
-
-    //Disconnects google Api client upon app Stop
-    @Override
-    protected void onStop() {
-        super.onStop();
-/*        if (mGoogleApiClient.isConnected()) {
-            mGoogleApiClient.disconnect();
-        }*/
+        if (!mGoogleApiClient.isConnected()) {
+            mGoogleApiClient.connect();
+        }
     }
 
     @Override
@@ -632,20 +625,6 @@ public class RecordLapActivity extends AppCompatActivity implements
             startLocationUpdates();
         }
         updateLocationUI();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-/*        if (mGoogleApiClient.isConnected()) {
-            stopLocationUpdates();
-        }*/
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
     }
 
     @Override
