@@ -6,97 +6,6 @@
     android:layout_height="match_parent"
     tools:context="com.sn1006.atkins.sprint.RecordLapActivity">
 
-    <TextView
-        android:id="@+id/latitude"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="xx.xx"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="16dp"
-        android:layout_marginLeft="16dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        android:layout_marginStart="16dp" />
-
-    <TextView
-        android:id="@+id/longitude"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="yy.yy"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="16dp"
-        app:layout_constraintLeft_toRightOf="@+id/latitude"
-        android:layout_marginLeft="11dp"
-        android:layout_marginStart="11dp" />
-
-    <TextView
-        android:id="@+id/gpsCounter"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="NumUpdates"
-        android:layout_marginTop="5dp"
-        app:layout_constraintTop_toBottomOf="@+id/latitude"
-        android:layout_marginLeft="8dp"
-        app:layout_constraintLeft_toLeftOf="@+id/latitude"
-        android:layout_marginStart="8dp" />
-
-
-    <TextView
-        android:id="@+id/distWaypoint"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="DistWaypoint"
-        android:layout_marginTop="10dp"
-        app:layout_constraintTop_toBottomOf="@+id/gpsCounter"
-        android:layout_marginLeft="16dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        android:layout_marginStart="16dp" />
-
-    <TextView
-        android:id="@+id/zoneStatus"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="zoneStatus"
-        android:layout_marginTop="25dp"
-        app:layout_constraintTop_toBottomOf="@+id/distWaypoint"
-        android:layout_marginLeft="16dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        android:textSize="20dp"
-        android:layout_marginStart="16dp" />
-
-    <TextView
-        android:id="@+id/timer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="00:00:00"
-        android:textSize="40dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintHorizontal_bias="0.543"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintVertical_bias="0.498" />
-    <TextView
-        android:id="@+id/bearingToWaypoint"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="bearingToWaypoint"
-        android:layout_marginTop="26dp"
-        app:layout_constraintTop_toBottomOf="@+id/zoneStatus"
-        android:layout_marginLeft="16dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        android:layout_marginStart="16dp" />
-
-    <TextView
-        android:id="@+id/showLaptimes"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="LAPTIMES"
-        android:layout_marginLeft="8dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginBottom="8dp"
-        android:layout_marginStart="8dp" />
-
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/stopRecording"
         android:layout_width="66dp"
@@ -110,10 +19,179 @@
         app:layout_constraintRight_toRightOf="parent"
         android:layout_marginLeft="8dp"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintHorizontal_bias="0.501"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginBottom="72dp"
-        tools:layout_editor_absoluteY="369dp"
-        tools:layout_editor_absoluteX="163dp" />
+        android:layout_marginBottom="32dp" />
+
+    <TextView
+        android:id="@+id/currentLapTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="00:00:000"
+        android:textSize="54sp"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="54dp"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginRight="8dp"
+        app:layout_constraintRight_toRightOf="parent" />
+
+    <TextView
+        android:id="@+id/lastLapTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="00:00:000"
+        android:textSize="54sp"
+        android:layout_marginTop="54dp"
+        app:layout_constraintTop_toBottomOf="@+id/currentLapTime"
+        android:layout_marginRight="8dp"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintLeft_toLeftOf="parent" />
+
+    <TextView
+        android:id="@+id/bestLapTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="00:00:000"
+        android:textSize="54sp"
+        android:layout_marginTop="54dp"
+        app:layout_constraintTop_toBottomOf="@+id/lastLapTime"
+        android:layout_marginRight="8dp"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintLeft_toLeftOf="parent" />
+
+    <TextView
+        android:id="@+id/distWaypoint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TextView"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="8dp" />
+
+    <TextView
+        android:id="@+id/zoneStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TextView"
+        android:layout_marginRight="8dp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="8dp" />
+
+
+    <!--THE LAYOUT BELOW HAS BEEN SAVED FOR TESTING PURPOSES.
+
+        <TextView
+            android:id="@+id/latitude"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="xx.xx"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="16dp"
+            android:layout_marginLeft="16dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            android:layout_marginStart="16dp" />
+
+        <TextView
+            android:id="@+id/longitude"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="yy.yy"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="16dp"
+            app:layout_constraintLeft_toRightOf="@+id/latitude"
+            android:layout_marginLeft="11dp"
+            android:layout_marginStart="11dp" />
+
+        <TextView
+            android:id="@+id/gpsCounter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="NumUpdates"
+            android:layout_marginTop="5dp"
+            app:layout_constraintTop_toBottomOf="@+id/latitude"
+            android:layout_marginLeft="8dp"
+            app:layout_constraintLeft_toLeftOf="@+id/latitude"
+            android:layout_marginStart="8dp" />
+
+
+        <TextView
+            android:id="@+id/distWaypoint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="DistWaypoint"
+            android:layout_marginTop="10dp"
+            app:layout_constraintTop_toBottomOf="@+id/gpsCounter"
+            android:layout_marginLeft="16dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            android:layout_marginStart="16dp" />
+
+        <TextView
+            android:id="@+id/zoneStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="zoneStatus"
+            android:layout_marginTop="25dp"
+            app:layout_constraintTop_toBottomOf="@+id/distWaypoint"
+            android:layout_marginLeft="16dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            android:textSize="20dp"
+            android:layout_marginStart="16dp" />
+
+        <TextView
+            android:id="@+id/timer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="00:00:00"
+            android:textSize="40dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintHorizontal_bias="0.543"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintVertical_bias="0.498" />
+        <TextView
+            android:id="@+id/bearingToWaypoint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="bearingToWaypoint"
+            android:layout_marginTop="26dp"
+            app:layout_constraintTop_toBottomOf="@+id/zoneStatus"
+            android:layout_marginLeft="16dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            android:layout_marginStart="16dp" />
+
+        <TextView
+            android:id="@+id/showLaptimes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="LAPTIMES"
+            android:layout_marginLeft="8dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginBottom="8dp"
+            android:layout_marginStart="8dp" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/stopRecording"
+            android:layout_width="66dp"
+            android:layout_height="70dp"
+            app:backgroundTint="@color/colorPrimary"
+            android:clickable="true"
+            android:onClick="viewLapTimes"
+            app:fabSize="mini"
+            app:srcCompat="@drawable/stop"
+            android:layout_marginRight="8dp"
+            app:layout_constraintRight_toRightOf="parent"
+            android:layout_marginLeft="8dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintHorizontal_bias="0.501"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginBottom="72dp"
+            tools:layout_editor_absoluteY="369dp"
+            tools:layout_editor_absoluteX="163dp" />-->
 
 </android.support.constraint.ConstraintLayout>

@@ -2,7 +2,6 @@ package com.sn1006.atkins.sprint;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.Service;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -14,14 +13,10 @@ import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.IBinder;
-import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.Loader;
 import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
@@ -47,9 +42,6 @@ import com.sn1006.atkins.sprint.data.TrackData;
 
 import android.support.v7.app.AppCompatActivity;
 
-import java.util.ArrayList;
-
-
 public class RecordLapActivity extends AppCompatActivity implements
         OnConnectionFailedListener,
         ConnectionCallbacks,
@@ -63,17 +55,24 @@ public class RecordLapActivity extends AppCompatActivity implements
 
     protected SQLiteDatabase mDb;
 
-    //Testing Views / Strings
+/*    //Testing Views / Strings
     protected String mLatitudeLabel = "Lat";
     protected String mLongitudeLabel = "Long";
     protected TextView mLatitudeText;
     protected TextView mLongitudeText;
     protected TextView mNumberUpdatesText;
-    protected TextView mZoneStatusText;
+
     protected TextView mBearingToWaypointText;
-    protected TextView mDistanceFromWaypointText;
+
     protected TextView mLaptimesText;
-    protected double mNumberUpdates;
+    protected TextView mTimerText;
+    protected double mNumberUpdates;*/
+protected TextView mDistanceFromWaypointText;
+    protected TextView mZoneStatusText;
+    //Production Views
+    protected TextView mCurrentLapTimeText;
+    protected TextView mPreviousLapTimeText;
+    protected TextView mBestLapTimeText;
 
     protected Location mCurrentLocation;
     protected Location mPreviousLocation;
@@ -101,9 +100,6 @@ public class RecordLapActivity extends AppCompatActivity implements
     protected double mZoneSize = 28; //meters
     protected boolean mIsInZone = false; //User is in the above listed radius in relation to start zone
     protected boolean mHasLeftZone = false; //User has left the start zone after triggering the timer
-
-
-    protected TextView mTimerText;
 
     protected double mDistanceFromWaypoint; //meters
     protected double mWaypointBearing; //degrees
@@ -142,13 +138,22 @@ public class RecordLapActivity extends AppCompatActivity implements
         mySession.setDriver(driverName);
         mySession.setTrack(track);
 
+/*      TEST UI LAYOUT
         mLatitudeText = (TextView) findViewById(R.id.latitude);
         mLongitudeText = (TextView) findViewById(R.id.longitude);
         mNumberUpdatesText = (TextView) findViewById(R.id.gpsCounter);
-        mDistanceFromWaypointText = (TextView) findViewById(R.id.distWaypoint);
-        mZoneStatusText = (TextView) findViewById(R.id.zoneStatus);
+
+
         mTimerText = (TextView) findViewById(R.id.timer);
-        mBearingToWaypointText = (TextView) findViewById(R.id.bearingToWaypoint);
+        mBearingToWaypointText = (TextView) findViewById(R.id.bearingToWaypoint);*/
+        mZoneStatusText = (TextView) findViewById(R.id.zoneStatus);
+        mDistanceFromWaypointText = (TextView) findViewById(R.id.distWaypoint);
+
+        //Production UI Layout
+        mCurrentLapTimeText = (TextView) findViewById(R.id.currentLapTime);
+        mPreviousLapTimeText= (TextView) findViewById(R.id.lastLapTime);
+        mBestLapTimeText = (TextView) findViewById(R.id.bestLapTime);
+
 
         mRequestingLocationUpdates = false;
 
@@ -172,13 +177,12 @@ public class RecordLapActivity extends AppCompatActivity implements
         buildLocationSettingsRequest();
 
         if (savedInstanceState != null) {
-            mNumberUpdates = savedInstanceState.getDouble(NUMOFUPDATES_TEXT_KEY);
             mySession.convertStringToArray(savedInstanceState.getString(LAPTIMES_TEXT_KEY));
             mySession.setBestLap(savedInstanceState.getString(BESTLAP_TEXT_KEY));
             if (savedInstanceState.containsKey(STARTTIME_TEXT_KEY)) {
                 t.start();
                 t.setStartTime(savedInstanceState.getLong(STARTTIME_TEXT_KEY));
-                mTimerText.setText(t.getElapsedTime());
+                mCurrentLapTimeText.setText(t.getElapsedTime());
                 handler.postDelayed(updater, 30);
             }
         }
@@ -190,7 +194,7 @@ public class RecordLapActivity extends AppCompatActivity implements
         public void run() {
             if (t.getRunning()) {
                 //set text to the elapsed time managed by timer class
-                mTimerText.setText(t.getElapsedTime());
+                mCurrentLapTimeText.setText(t.getElapsedTime());
                 //update every 30 milliseconds
                 handler.postDelayed(updater, 30);
             }
@@ -201,9 +205,8 @@ public class RecordLapActivity extends AppCompatActivity implements
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putDouble(NUMOFUPDATES_TEXT_KEY, mNumberUpdates);
         outState.putString(LAPTIMES_TEXT_KEY, mySession.getLaptimesAsString());
-        outState.putString(BESTLAP_TEXT_KEY, mySession.getBestLap());
+        outState.putString(BESTLAP_TEXT_KEY, mySession.getBestLapString());
         if (t.getRunning()) {
             outState.putLong(STARTTIME_TEXT_KEY, t.getStartTime());
         }
@@ -349,16 +352,17 @@ public class RecordLapActivity extends AppCompatActivity implements
     //Sets the UI values for the latitude and longitude
     protected void updateLocationUI() {
         if (mCurrentLocation != null) {
-            mLatitudeText.setText(String.format("%s: %f", mLatitudeLabel,
+            /*mLatitudeText.setText(String.format("%s: %f", mLatitudeLabel,
                     mCurrentLocation.getLatitude()));
             mLongitudeText.setText(String.format("%s: %f", mLongitudeLabel,
                     mCurrentLocation.getLongitude()));
             mNumberUpdatesText.setText(String.format("%s: %f", "# Updates", mNumberUpdates));
+                        mBearingToWaypointText.setText("Bearing to WP " + normalizeDegrees(mWaypointBearing));
+            //AGAIN, THIS IS A TEMP TEXT VIEW TO BE REMOVED ONCE LAPTIMES HAS ITS OWN ACTIVITY
+            mLaptimesText = (TextView) findViewById(R.id.showLaptimes);*/
             mDistanceFromWaypointText.setText(String.format("%s: %f", "Dist from WP", mDistanceFromWaypoint));
             mZoneStatusText.setText("IN THE ZONE? " + mIsInZone);
-            mBearingToWaypointText.setText("Bearing to WP " + normalizeDegrees(mWaypointBearing));
-            //AGAIN, THIS IS A TEMP TEXT VIEW TO BE REMOVED ONCE LAPTIMES HAS ITS OWN ACTIVITY
-            mLaptimesText = (TextView) findViewById(R.id.showLaptimes);
+
         }
     }
 
@@ -515,17 +519,10 @@ public class RecordLapActivity extends AppCompatActivity implements
                 //finishTimeEstimate must be known before startTimeEstimate can be called
                 t.stop();
                 mHasLeftZone = false;
-                //Lap done, record it!
-                /*--------------------------------------------------------------------------
-                ** CURRENTLY RECORDING LAPTIMES IN A SESSION CREATED IN ONCREATE()
-                ** IN FUTURE THERE WILL BE MULTIPLE SESSIONS...
-                ** SO WE WILL HAVE AN OBJECT THAT HOLDS A LIST OF SESSIONS (HASHMAP?)
-                ** AND WILL HAVE TO ADD IT TO THE PROPER SESSION
-                **--------------------------------------------------------------------------
-                 */
                 mySession.addLap(t.getLaptime());
                 //update laptimes textview with a list of the session's laptimes
-                mLaptimesText.setText(mySession.toString());
+                mPreviousLapTimeText.setText(mySession.formatLaptime(t.getLaptime()));
+                mBestLapTimeText.setText(mySession.formatLaptime(mySession.getBestLapLong()));
             }
         } else {
             //The user has left the zone
@@ -605,7 +602,7 @@ public class RecordLapActivity extends AppCompatActivity implements
         //Controls lap timer functionality based on location relative to the user and the waypoint
         isUserInStartZone();
 
-        mNumberUpdates++;
+        //mNumberUpdates++;
         updateLocationUI();
     }
 
@@ -629,7 +626,7 @@ public class RecordLapActivity extends AppCompatActivity implements
 
     @Override
     public void run() {
-        mTimerText.setText("RUNNING");
+        mCurrentLapTimeText.setText("RUNNING");
     }
 
 
@@ -663,7 +660,7 @@ public class RecordLapActivity extends AppCompatActivity implements
 
         cv.put(SessionContract.SessionEntry.COLUMN_TRACKNAME, mySession.getTrackName());
         cv.put(SessionContract.SessionEntry.COLUMN_DRIVER, mySession.getDriver());
-        cv.put(SessionContract.SessionEntry.COLUMN_BESTLAP, mySession.getBestLap());
+        cv.put(SessionContract.SessionEntry.COLUMN_BESTLAP, mySession.getBestLapString());
         cv.put(SessionContract.SessionEntry.COLUMN_LAPTIMES, mySession.getLaptimesAsString());
         cv.put(SessionContract.SessionEntry.COLUMN_NUMBEROFLAPS, mySession.getNumberOfLaps());
 

@@ -76,7 +76,7 @@ public class SessionListActivity extends AppCompatActivity implements SessionLis
         Context context = this;
         Class destinationClass = LapListActivity.class;
         Intent intentToStartDetailActivity = new Intent(context, destinationClass);
-        String s = String.valueOf(clickedItemIndex);
+        String s = String.valueOf(clickedItemIndex-1);
         intentToStartDetailActivity.putExtra(Intent.EXTRA_TEXT, s);
         startActivity(intentToStartDetailActivity);
     }

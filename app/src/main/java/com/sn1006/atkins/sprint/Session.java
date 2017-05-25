@@ -35,10 +35,6 @@ public class Session {
         this.driver = "@string/pref_driver_default";
     }
 
-    public String getBestLap() {
-        return "" + this.bestLap;
-    }
-
     public String getTrackName() {
         return this.trackname;
     }
@@ -68,9 +64,6 @@ public class Session {
             }
         }
         return lapTimesAsString;
-    }
-
-    public ArrayList <Long> getLapTimesAsArray(){ return this.laptimes;
     }
 
     //add a lap to the session
@@ -105,10 +98,10 @@ public class Session {
         millis = (int) (laptime - mins*60000 - secs*1000);
 
         return (String.format("%02d",mins) + ":" + String.format("%02d",secs) + ":"
-                + String.format("%02d",millis));
+                + String.format("%03d",millis));
     }
 
-    //prints out list of all laptimes in the session, with the best lap in bold
+/*    //prints out list of all laptimes in the session, with the best lap in bold
     @Override
     public String toString() {
         String laptimesAsString = "";
@@ -125,7 +118,7 @@ public class Session {
         }
 
         return laptimesAsString;
-    }
+    }*/
 
     public void convertStringToArray(String str) {
         this.laptimes.clear();
@@ -138,5 +131,17 @@ public class Session {
 
     public void setBestLap (String bestLap){
         this.bestLap = Long.parseLong(bestLap);
+    }
+
+    public Long getLastLapLong(){
+        return this.laptimes.get(this.laptimes.lastIndexOf(this));
+    }
+
+    public String getBestLapString() {
+        return "" + this.bestLap;
+    }
+
+    public Long getBestLapLong(){
+        return this.bestLap;
     }
 }
