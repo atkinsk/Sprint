@@ -74,6 +74,7 @@
         android:layout_marginTop="8dp"
         android:text="Best Lap Time"
         android:textSize="14sp"
+        android:textStyle="bold"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/avgLap" />
 </android.support.constraint.ConstraintLayout>

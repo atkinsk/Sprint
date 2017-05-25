@@ -102,6 +102,7 @@ public class RecordLapActivity extends AppCompatActivity implements
     protected double mDistanceFromWaypoint; //meters
     protected double mWaypointBearing; //degrees
     protected double mPreviousWaypointBearing; //degrees
+    protected long mStartTimeMod;//ms
 
     //Waypoint location object
     protected Location mWaypoint = new Location("waypoint");
@@ -407,36 +408,46 @@ public class RecordLapActivity extends AppCompatActivity implements
             //Calculates the bearings of the user's current location relative to the start point
             mWaypointBearing = mCurrentLocation.bearingTo(mWaypoint);
             mPreviousWaypointBearing = mPreviousLocation.bearingTo(mWaypoint);
-            //When the timer is not running, start the timer
-            if (!t.getRunning()) {
+            //When the timer is not running, start the timer. This will only trigger on the first lap
+            if (!t.getRunning() /*&& isUserPastStartPoint()*/) {
+                //Calculates the time between the current location which triggered the timer to start
+                //and the approximate time the user would have crossed the start line
+                mStartTimeMod = t.getTimeBetweenGpsPing(mCurrentLocation, mPreviousLocation)
+                        - t.finishTimeEstimate(mCurrentLocation, mPreviousLocation);
                 t.start();
             }
             //When the timer is running the timer will be stopped if and only if the user has
             //already left the start zone and returned to it. This keeps the timer from stopping
             //if the GPS coordinates of the user are in the start zone for two GPS pings
-
             //Also checks to see if the user has crossed the start point via bearings delta
             if (t.getRunning() && mHasLeftZone /*&& isUserPastStartPoint()*/) {
-                double finishTimeMod = t.finishTimeEstimate(mCurrentLocation, mPreviousLocation);
-                //finishTimeEstimate must be known before startTimeEstimate can be called
+                //Calculates the time between the current location which triggered the timer to stop
+                //and the approximate time the user would have crossed the finish line
+                long finishTimeMod = t.getTimeBetweenGpsPing(mCurrentLocation, mPreviousLocation)
+                        - t.finishTimeEstimate(mCurrentLocation, mPreviousLocation);
+                //stops the timer for this lap
                 t.stop();
+                //Resets the logic that the user has left the zone
                 mHasLeftZone = false;
-                //Lap done, record it!
-                /*--------------------------------------------------------------------------
-                ** CURRENTLY RECORDING LAPTIMES IN A SESSION CREATED IN ONCREATE()
-                ** IN FUTURE THERE WILL BE MULTIPLE SESSIONS...
-                ** SO WE WILL HAVE AN OBJECT THAT HOLDS A LIST OF SESSIONS (HASHMAP?)
-                ** AND WILL HAVE TO ADD IT TO THE PROPER SESSION
-                **--------------------------------------------------------------------------
-                 */
-                mySession.addLap(t.getLaptime());
-                //update laptimes textview with a list of the session's laptimes
+
+
+                //Modifies the lap time to subtract both the modifiers from the lap start
+                //and lap finish
+                mySession.addLap(t.getLaptime() - mStartTimeMod - finishTimeMod);
+
+                //Sets the modifier for the lap start to the previous lap's lap finish modifier
+                mStartTimeMod = finishTimeMod;
                 mLaptimesText.setText(mySession.toString());
+
+                //Restarts the timer for the next lap
+                t.start();
             }
         } else {
-            //The user has left the zone
             mIsInZone = false;
-            mHasLeftZone = true;
+            //The user has left the zone while the timer is running
+            if (t.getRunning()) {
+                mHasLeftZone = true;
+            }
         }
     }
 
@@ -559,7 +570,7 @@ public class RecordLapActivity extends AppCompatActivity implements
     //the current session to the database if a lap exists. Returns to main menu if no lap exists
     protected void viewLapTimes(View view) {
         //Checks if a lap exists for the current recording
-        if(!mySession.getLaptimesAsString().equals("")) {
+        if (!mySession.getLaptimesAsString().equals("")) {
             //Adds the new session to the database
             addNewSession();
             //takes user to laplist
