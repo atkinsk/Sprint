@@ -8,7 +8,7 @@
     tools:context="com.sn1006.atkins.sprint.LapListActivity">
 
 
-    <android.support.v7.widget.RecyclerView
+    <com.chauthai.overscroll.RecyclerViewBouncy
         android:id="@+id/all_lap_list_view"
         android:layout_width="366dp"
         android:layout_height="600dp"
@@ -17,7 +17,7 @@
         app:layout_constraintTop_toBottomOf="@+id/numberOfLaps"
         app:layout_constraintRight_toRightOf="parent">
 
-    </android.support.v7.widget.RecyclerView>
+    </com.chauthai.overscroll.RecyclerViewBouncy>
 
     <TextView
         android:id="@+id/numberOfLaps"

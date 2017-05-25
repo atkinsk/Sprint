@@ -22,28 +22,28 @@ public class SessionListActivity extends AppCompatActivity implements SessionLis
 
     private SessionListAdapter mAdapter;
     private SQLiteDatabase mDb;
+    private RecyclerView mSessionRecyclerView;
+    private Cursor mCursor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_session_list);
 
-
         //Initiation of the recyclerview for the session list
-        RecyclerView sessionRecyclerView;
-        sessionRecyclerView = (RecyclerView) this.findViewById(R.id.all_session_list_view);
-        sessionRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mSessionRecyclerView = (RecyclerView) this.findViewById(R.id.all_session_list_view);
+        mSessionRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         SessionDbHelper dbHelper = new SessionDbHelper(this);
 
         mDb = dbHelper.getReadableDatabase();
 
         //Pulls the session list from the database (readable)
-        Cursor cursor = getSessionList();
+        mCursor = getSessionList();
 
         //Initiates and sets the SessionListAdapter for the recyclerview
-        mAdapter = new SessionListAdapter(this, cursor, this);
-        sessionRecyclerView.setAdapter(mAdapter);
+        mAdapter = new SessionListAdapter(this, mCursor, this);
+        mSessionRecyclerView.setAdapter(mAdapter);
     }
 
     //Query for retrieving the sessionlist
@@ -82,6 +82,25 @@ public class SessionListActivity extends AppCompatActivity implements SessionLis
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        //Initiation of the recyclerview for the session list
+        mSessionRecyclerView = (RecyclerView) this.findViewById(R.id.all_session_list_view);
+        mSessionRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        SessionDbHelper dbHelper = new SessionDbHelper(this);
+
+        mDb = dbHelper.getReadableDatabase();
+
+        //Pulls the session list from the database (readable)
+        mCursor = getSessionList();
+
+        //Initiates and sets the SessionListAdapter for the recyclerview
+        mAdapter = new SessionListAdapter(this, mCursor, this);
+        mSessionRecyclerView.setAdapter(mAdapter);
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.sprint_settings, menu);
@@ -98,4 +117,6 @@ public class SessionListActivity extends AppCompatActivity implements SessionLis
         }
         return super.onOptionsItemSelected(item);
     }
+
+
 }

@@ -22,7 +22,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginBottom="16dp" />
 
-    <android.support.v7.widget.RecyclerView
+    <com.chauthai.overscroll.RecyclerViewBouncy
         android:id="@+id/all_session_list_view"
         android:layout_width="366dp"
         android:layout_height="540dp"

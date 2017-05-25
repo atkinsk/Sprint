@@ -46,19 +46,19 @@ public class Timer {
         int secs;
         int millis;
 
-        if(running) {
+        if (running) {
             elapsed = System.currentTimeMillis() - startTime;
-        }
-        else {
+        } else {
             elapsed = stopTime - startTime;
         }
 
-        mins = (int) (elapsed/60000);
-        secs = (int) (elapsed - mins*60000)/1000;
-        millis = (int) (elapsed - mins*60000 - secs*1000);
+        mins = (int) (elapsed / 60000);
+        secs = (int) (elapsed - mins * 60000) / 1000;
+        millis = (int) (elapsed - mins * 60000 - secs * 1000);
 
-        return ("Time: " + String.format("%02d",mins) + ":" + String.format("%02d",secs) + ":"
-                + String.format("%02d",millis));
+        //Keeps 3 digits when a second rolls over. Perhaps find a better way of doing this
+            return ("Time: " + String.format("%02d", mins) + ":" + String.format("%02d", secs) + ":"
+                    + String.format("%03d", millis));
     }
 
     double finishTimeEstimate(Location currentLocation, Location previousLocation) {

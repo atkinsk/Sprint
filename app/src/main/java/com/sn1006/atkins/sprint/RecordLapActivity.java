@@ -91,7 +91,7 @@ public class RecordLapActivity extends AppCompatActivity implements
     protected final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 23;
 
     //set size of zone for testing waypoint arrival/departure
-    protected double mZoneSize = 60; //meters
+    protected double mZoneSize = 28; //meters
     protected boolean mIsInZone = false; //User is in the above listed radius in relation to start zone
     protected boolean mHasLeftZone = false; //User has left the start zone after triggering the timer
 
@@ -416,7 +416,7 @@ public class RecordLapActivity extends AppCompatActivity implements
             //if the GPS coordinates of the user are in the start zone for two GPS pings
 
             //Also checks to see if the user has crossed the start point via bearings delta
-            if (t.getRunning() && mHasLeftZone && isUserPastStartPoint()) {
+            if (t.getRunning() && mHasLeftZone /*&& isUserPastStartPoint()*/) {
                 double finishTimeMod = t.finishTimeEstimate(mCurrentLocation, mPreviousLocation);
                 //finishTimeEstimate must be known before startTimeEstimate can be called
                 t.stop();
