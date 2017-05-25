@@ -52,7 +52,7 @@ public class SessionListAdapter extends RecyclerView.Adapter<SessionListAdapter.
 
 
         convertStringToArray(listOfLapsString);
-        long avgLap = totalSessionTime() / Integer.parseInt(numberOfLaps);
+        long avgLap = totalSessionTime() / Long.parseLong(numberOfLaps);
 
         holder.driverNameTextView.setText(driverName);
         holder.dateTimeTextView.setText(dateStamp);
@@ -124,7 +124,7 @@ public class SessionListAdapter extends RecyclerView.Adapter<SessionListAdapter.
         millis = (int) (laptime - mins * 60000 - secs * 1000);
 
         return (String.format("%02d", mins) + ":" + String.format("%02d", secs) + ":"
-                + String.format("%02d", millis));
+                + String.format("%03d", millis));
 
     }
     //Interface used in SessionListActivity to handle the transfer information about what item was

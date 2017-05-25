@@ -91,6 +91,6 @@ public class LapListAdapter extends RecyclerView.Adapter<LapListAdapter.LapViewH
         millis = (int) (laptime - mins*60000 - secs*1000);
 
         return (String.format("%02d",mins) + ":" + String.format("%02d",secs) + ":"
-                + String.format("%02d",millis));
+                + String.format("%03d",millis));
     }
 }
