@@ -134,7 +134,7 @@ public class Session {
     }
 
     public Long getLastLapLong(){
-        return this.laptimes.get(this.laptimes.lastIndexOf(this));
+        return this.laptimes.get(this.laptimes.size()-1);
     }
 
     public String getBestLapString() {

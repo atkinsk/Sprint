@@ -55,21 +55,8 @@ public class RecordLapActivity extends AppCompatActivity implements
 
     protected SQLiteDatabase mDb;
 
-/*    //Testing Views / Strings
-    protected String mLatitudeLabel = "Lat";
-    protected String mLongitudeLabel = "Long";
-    protected TextView mLatitudeText;
-    protected TextView mLongitudeText;
-    protected TextView mNumberUpdatesText;
-
-    protected TextView mBearingToWaypointText;
-
-    protected TextView mLaptimesText;
-    protected TextView mTimerText;
-    protected double mNumberUpdates;*/
-protected TextView mDistanceFromWaypointText;
+    protected TextView mDistanceFromWaypointText;
     protected TextView mZoneStatusText;
-    //Production Views
     protected TextView mCurrentLapTimeText;
     protected TextView mPreviousLapTimeText;
     protected TextView mBestLapTimeText;
@@ -97,7 +84,7 @@ protected TextView mDistanceFromWaypointText;
     protected final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 23;
 
     //set size of zone for testing waypoint arrival/departure
-    protected double mZoneSize = 28; //meters
+    protected double mZoneSize = 29; //meters
     protected boolean mIsInZone = false; //User is in the above listed radius in relation to start zone
     protected boolean mHasLeftZone = false; //User has left the start zone after triggering the timer
 
@@ -138,20 +125,12 @@ protected TextView mDistanceFromWaypointText;
         mySession.setDriver(driverName);
         mySession.setTrack(track);
 
-/*      TEST UI LAYOUT
-        mLatitudeText = (TextView) findViewById(R.id.latitude);
-        mLongitudeText = (TextView) findViewById(R.id.longitude);
-        mNumberUpdatesText = (TextView) findViewById(R.id.gpsCounter);
-
-
-        mTimerText = (TextView) findViewById(R.id.timer);
-        mBearingToWaypointText = (TextView) findViewById(R.id.bearingToWaypoint);*/
-        mZoneStatusText = (TextView) findViewById(R.id.zoneStatus);
+//        mZoneStatusText = (TextView) findViewById(R.id.zoneStatus);
         mDistanceFromWaypointText = (TextView) findViewById(R.id.distWaypoint);
 
         //Production UI Layout
         mCurrentLapTimeText = (TextView) findViewById(R.id.currentLapTime);
-        mPreviousLapTimeText= (TextView) findViewById(R.id.lastLapTime);
+        mPreviousLapTimeText= (TextView) findViewById(R.id.previousLapTime);
         mBestLapTimeText = (TextView) findViewById(R.id.bestLapTime);
 
 
@@ -177,8 +156,12 @@ protected TextView mDistanceFromWaypointText;
         buildLocationSettingsRequest();
 
         if (savedInstanceState != null) {
-            mySession.convertStringToArray(savedInstanceState.getString(LAPTIMES_TEXT_KEY));
-            mySession.setBestLap(savedInstanceState.getString(BESTLAP_TEXT_KEY));
+            if(savedInstanceState.containsKey(LAPTIMES_TEXT_KEY)) {
+                mySession.convertStringToArray(savedInstanceState.getString(LAPTIMES_TEXT_KEY));
+                mPreviousLapTimeText.setText(mySession.formatLaptime(mySession.getLastLapLong()));
+                mySession.setBestLap(savedInstanceState.getString(BESTLAP_TEXT_KEY));
+                mBestLapTimeText.setText(mySession.formatLaptime(mySession.getBestLapLong()));
+            }
             if (savedInstanceState.containsKey(STARTTIME_TEXT_KEY)) {
                 t.start();
                 t.setStartTime(savedInstanceState.getLong(STARTTIME_TEXT_KEY));
@@ -205,8 +188,10 @@ protected TextView mDistanceFromWaypointText;
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putString(LAPTIMES_TEXT_KEY, mySession.getLaptimesAsString());
-        outState.putString(BESTLAP_TEXT_KEY, mySession.getBestLapString());
+        if(!mySession.getLaptimesAsString().equals("")){
+            outState.putString(BESTLAP_TEXT_KEY, mySession.getBestLapString());
+            outState.putString(LAPTIMES_TEXT_KEY, mySession.getLaptimesAsString());
+        }
         if (t.getRunning()) {
             outState.putLong(STARTTIME_TEXT_KEY, t.getStartTime());
         }
@@ -352,17 +337,8 @@ protected TextView mDistanceFromWaypointText;
     //Sets the UI values for the latitude and longitude
     protected void updateLocationUI() {
         if (mCurrentLocation != null) {
-            /*mLatitudeText.setText(String.format("%s: %f", mLatitudeLabel,
-                    mCurrentLocation.getLatitude()));
-            mLongitudeText.setText(String.format("%s: %f", mLongitudeLabel,
-                    mCurrentLocation.getLongitude()));
-            mNumberUpdatesText.setText(String.format("%s: %f", "# Updates", mNumberUpdates));
-                        mBearingToWaypointText.setText("Bearing to WP " + normalizeDegrees(mWaypointBearing));
-            //AGAIN, THIS IS A TEMP TEXT VIEW TO BE REMOVED ONCE LAPTIMES HAS ITS OWN ACTIVITY
-            mLaptimesText = (TextView) findViewById(R.id.showLaptimes);*/
             mDistanceFromWaypointText.setText(String.format("%s: %f", "Dist from WP", mDistanceFromWaypoint));
-            mZoneStatusText.setText("IN THE ZONE? " + mIsInZone);
-
+           // mZoneStatusText.setText("IN THE ZONE? " + mIsInZone);
         }
     }
 
@@ -446,18 +422,19 @@ protected TextView mDistanceFromWaypointText;
             mWaypointBearing = mCurrentLocation.bearingTo(mWaypoint);
             mPreviousWaypointBearing = mPreviousLocation.bearingTo(mWaypoint);
             //When the timer is not running, start the timer. This will only trigger on the first lap
-            if (!t.getRunning() *//*&& isUserPastStartPoint()*//*) {
+            if (!t.getRunning() && isUserPastStartPoint()) {
                 //Calculates the time between the current location which triggered the timer to start
                 //and the approximate time the user would have crossed the start line
                 mStartTimeMod = t.getTimeBetweenGpsPing(mCurrentLocation, mPreviousLocation)
                         - t.finishTimeEstimate(mCurrentLocation, mPreviousLocation);
                 t.start();
+                handler.postDelayed(updater, 30);
             }
             //When the timer is running the timer will be stopped if and only if the user has
             //already left the start zone and returned to it. This keeps the timer from stopping
             //if the GPS coordinates of the user are in the start zone for two GPS pings
             //Also checks to see if the user has crossed the start point via bearings delta
-            if (t.getRunning() && mHasLeftZone *//*&& isUserPastStartPoint()*//*) {
+            if (t.getRunning() && mHasLeftZone && isUserPastStartPoint()) {
                 //Calculates the time between the current location which triggered the timer to stop
                 //and the approximate time the user would have crossed the finish line
                 long finishTimeMod = t.getTimeBetweenGpsPing(mCurrentLocation, mPreviousLocation)
@@ -472,12 +449,16 @@ protected TextView mDistanceFromWaypointText;
                 //and lap finish
                 mySession.addLap(t.getLaptime() - mStartTimeMod - finishTimeMod);
 
+                //update laptimes textview with a list of the session's laptimes
+                mPreviousLapTimeText.setText(mySession.formatLaptime(t.getLaptime()));
+                mBestLapTimeText.setText(mySession.formatLaptime(mySession.getBestLapLong()));
+
                 //Sets the modifier for the lap start to the previous lap's lap finish modifier
                 mStartTimeMod = finishTimeMod;
-                mLaptimesText.setText(mySession.toString());
 
                 //Restarts the timer for the next lap
                 t.start();
+                handler.postDelayed(updater, 30);
             }
         } else {
             mIsInZone = false;
@@ -495,6 +476,20 @@ protected TextView mDistanceFromWaypointText;
     * ---------------------------------------------------------------------------------------
     * */
     protected void isUserInStartZone() {
+        //test code
+        if (!t.getRunning()) {
+            t.start();
+            handler.postDelayed(updater, 30);
+        }
+
+        if((System.currentTimeMillis() - t.getStartTime())>5000){
+            t.stop();
+            mHasLeftZone = false;
+            mySession.addLap(t.getLaptime());
+            //update laptimes textview with a list of the session's laptimes
+            mPreviousLapTimeText.setText(mySession.formatLaptime(t.getLaptime()));
+            mBestLapTimeText.setText(mySession.formatLaptime(mySession.getBestLapLong()));
+        }
 
         //Checks to see if the user is in the specified radius near the start / end point
         if (mDistanceFromWaypoint < mZoneSize) {
