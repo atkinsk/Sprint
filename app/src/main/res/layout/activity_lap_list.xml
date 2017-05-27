@@ -11,7 +11,7 @@
     <com.chauthai.overscroll.RecyclerViewBouncy
         android:id="@+id/all_lap_list_view"
         android:layout_width="366dp"
-        android:layout_height="600dp"
+        android:layout_height="540dp"
         android:layout_marginTop="0dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/numberOfLaps"

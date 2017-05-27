@@ -60,6 +60,7 @@ public class RecordLapActivity extends AppCompatActivity implements
     protected TextView mCurrentLapTimeText;
     protected TextView mPreviousLapTimeText;
     protected TextView mBestLapTimeText;
+    protected TextView mCurrentTrackText;
 
     protected Location mCurrentLocation;
     protected Location mPreviousLocation;
@@ -108,7 +109,6 @@ public class RecordLapActivity extends AppCompatActivity implements
     protected String track;
 
     //Saved instance state keys
-    private static final String NUMOFUPDATES_TEXT_KEY = "callbacks";
     private static final String LAPTIMES_TEXT_KEY = "laptimes";
     private static final String STARTTIME_TEXT_KEY = "callbackstimer";
     private static final String BESTLAP_TEXT_KEY = "bestlaptime";
@@ -132,7 +132,9 @@ public class RecordLapActivity extends AppCompatActivity implements
         mCurrentLapTimeText = (TextView) findViewById(R.id.currentLapTime);
         mPreviousLapTimeText= (TextView) findViewById(R.id.previousLapTime);
         mBestLapTimeText = (TextView) findViewById(R.id.bestLapTime);
+        mCurrentTrackText = (TextView) findViewById(R.id.trackName);
 
+        mCurrentTrackText.setText(mySession.getTrackName());
 
         mRequestingLocationUpdates = false;
 
