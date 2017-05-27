@@ -8,11 +8,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-
 import com.sn1006.atkins.sprint.data.SessionContract;
 import com.sn1006.atkins.sprint.data.SessionDbHelper;
 
@@ -46,6 +46,7 @@ public class SessionListActivity extends AppCompatActivity implements SessionLis
         mSessionRecyclerView.setAdapter(mAdapter);
     }
 
+
     //Query for retrieving the sessionlist
     protected Cursor getSessionList() {
         return mDb.query(
@@ -76,7 +77,7 @@ public class SessionListActivity extends AppCompatActivity implements SessionLis
         Context context = this;
         Class destinationClass = LapListActivity.class;
         Intent intentToStartDetailActivity = new Intent(context, destinationClass);
-        String s = String.valueOf(clickedItemIndex);
+        String s = String.valueOf(clickedItemIndex-1);
         intentToStartDetailActivity.putExtra(Intent.EXTRA_TEXT, s);
         startActivity(intentToStartDetailActivity);
     }

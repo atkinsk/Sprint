@@ -66,7 +66,7 @@ public class Timer {
         millis = (int) (elapsed - mins * 60000 - secs * 1000);
 
         //Keeps 3 digits when a second rolls over. Perhaps find a better way of doing this
-        return ("Time: " + String.format("%02d", mins) + ":" + String.format("%02d", secs) + ":"
+        return (String.format("%02d", mins) + ":" + String.format("%02d", secs) + ":"
                 + String.format("%03d", millis));
     }
 
