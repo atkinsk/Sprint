@@ -42,6 +42,11 @@
     <string name="pref_track_bogie_value" translatable="false">bogie</string>
     <!-- Value in SharedPreferences for test track option -->
     <string name="pref_track_test_value" translatable="false">test</string>
+    <string name="title_activity_navigation_drawer">NavigationDrawer</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="title_activity_navigation">Navigation</string>
 
 
 </resources>

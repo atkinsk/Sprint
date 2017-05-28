@@ -18,7 +18,8 @@ import com.sn1006.atkins.sprint.data.SessionDbHelper;
 
 
 //Implements interface from SessionListAdapter to handle clicks on the recyclerview views
-public class SessionListActivity extends AppCompatActivity implements SessionListAdapter.SessionAdapterOnClickHandler {
+public class SessionListActivity extends AppCompatActivity
+        implements SessionListAdapter.SessionAdapterOnClickHandler {
 
     private SessionListAdapter mAdapter;
     private SQLiteDatabase mDb;
