@@ -2,6 +2,8 @@ package com.sn1006.atkins.sprint;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -16,7 +18,9 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.NotificationCompat;
 import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
@@ -112,6 +116,8 @@ public class RecordLapActivity extends AppCompatActivity implements
     private static final String LAPTIMES_TEXT_KEY = "laptimes";
     private static final String STARTTIME_TEXT_KEY = "callbackstimer";
     private static final String BESTLAP_TEXT_KEY = "bestlaptime";
+
+    private static final int mRecordingNotificationID = 911;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -413,7 +419,7 @@ public class RecordLapActivity extends AppCompatActivity implements
      * METHOD UNLESS USING A CAR
     * ---------------------------------------------------------------------------------------
     * */
-/*    protected void isUserInStartZone() {
+    /*protected void isUserInStartZone() {
 
         //Checks to see if the user is in the specified radius near the start / end point
         if (mDistanceFromWaypoint < mZoneSize) {
@@ -424,7 +430,7 @@ public class RecordLapActivity extends AppCompatActivity implements
             mWaypointBearing = mCurrentLocation.bearingTo(mWaypoint);
             mPreviousWaypointBearing = mPreviousLocation.bearingTo(mWaypoint);
             //When the timer is not running, start the timer. This will only trigger on the first lap
-            if (!t.getRunning() && isUserPastStartPoint()) {
+            if (!t.getRunning() isUserPastStartPoint()) {
                 //Calculates the time between the current location which triggered the timer to start
                 //and the approximate time the user would have crossed the start line
                 mStartTimeMod = t.getTimeBetweenGpsPing(mCurrentLocation, mPreviousLocation)
@@ -436,7 +442,7 @@ public class RecordLapActivity extends AppCompatActivity implements
             //already left the start zone and returned to it. This keeps the timer from stopping
             //if the GPS coordinates of the user are in the start zone for two GPS pings
             //Also checks to see if the user has crossed the start point via bearings delta
-            if (t.getRunning() && mHasLeftZone && isUserPastStartPoint()) {
+            if (t.getRunning() && mHasLeftZone isUserPastStartPoint()) {
                 //Calculates the time between the current location which triggered the timer to stop
                 //and the approximate time the user would have crossed the finish line
                 long finishTimeMod = t.getTimeBetweenGpsPing(mCurrentLocation, mPreviousLocation)
@@ -452,7 +458,7 @@ public class RecordLapActivity extends AppCompatActivity implements
                 mySession.addLap(t.getLaptime() - mStartTimeMod - finishTimeMod);
 
                 //update laptimes textview with a list of the session's laptimes
-                mPreviousLapTimeText.setText(mySession.formatLaptime(t.getLaptime()));
+                mPreviousLapTimeText.setText(mySession.formatLaptime(mySession.getLastLapLong()));
                 mBestLapTimeText.setText(mySession.formatLaptime(mySession.getBestLapLong()));
 
                 //Sets the modifier for the lap start to the previous lap's lap finish modifier
@@ -469,8 +475,8 @@ public class RecordLapActivity extends AppCompatActivity implements
                 mHasLeftZone = true;
             }
         }
-    }*/
-
+    }
+*/
     /*---------------------------------------------------------------------------------------
     * THIS IS A TESTING FUNCTION FOR THE TIMING FUNCTIONALITY. IF THE TIMING MODIFIER CALCULATIONS
     * ARE INCLUDED WHILE FINISHING LAPS WITHOUT CALLING ISUSERPASTSTARTPOINT, THE DATA WILL
@@ -558,6 +564,7 @@ public class RecordLapActivity extends AppCompatActivity implements
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         permissionCheck();
+        sendRecordingNotification();
         if (mCurrentLocation == null) {
             try {
                 mCurrentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
@@ -601,6 +608,7 @@ public class RecordLapActivity extends AppCompatActivity implements
 
         //mNumberUpdates++;
         updateLocationUI();
+
     }
 
     //Connects to our google Api client onStart
@@ -622,6 +630,12 @@ public class RecordLapActivity extends AppCompatActivity implements
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        cancelRecordingNotification();
+    }
+
+    @Override
     public void run() {
         mCurrentLapTimeText.setText("RUNNING");
     }
@@ -634,8 +648,10 @@ public class RecordLapActivity extends AppCompatActivity implements
         if (!mySession.getLaptimesAsString().equals("")) {
             //Stops timer when stop session button is clicked
             t.stop();
+            mGoogleApiClient.disconnect();
             //Adds the new session to the database
             addNewSession();
+            cancelRecordingNotification();
             //takes user to laplist
             Context context = this;
             Class destinationClass = LapListActivity.class;
@@ -645,6 +661,7 @@ public class RecordLapActivity extends AppCompatActivity implements
             //Brings user to sessionListActivity and returns a toast to say no laps were recorded
             //and nothing has been saved to the database
             returnToSessionList();
+            cancelRecordingNotification();
 
             Toast toast = Toast.makeText(this, "Session not saved - No laps recorded", Toast.LENGTH_LONG);
             toast.show();
@@ -671,5 +688,30 @@ public class RecordLapActivity extends AppCompatActivity implements
         Class destinationClass = SessionListActivity.class;
         Intent intentToStartDetailActivity = new Intent(context, destinationClass);
         startActivity(intentToStartDetailActivity);
+    }
+
+    public void sendRecordingNotification(){
+
+        /*Pending intent omitted until we get better data persistence in place
+        Intent intent = new Intent (this, RecordLapActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);*/
+
+        NotificationCompat.Builder mBuilder = (android.support.v7.app.NotificationCompat.Builder) new NotificationCompat.Builder(this)
+                .setSmallIcon(R.drawable.road)
+                .setContentTitle("Sprint LT is recording your session")
+                .setContentText(mySession.getTrackName())
+                .setOngoing(true);
+               // .setContentIntent(pendingIntent);
+
+        NotificationManager mNotificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        mNotificationManager.notify(mRecordingNotificationID, mBuilder.build());
+
+    }
+
+    public void cancelRecordingNotification(){
+        NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.cancel(mRecordingNotificationID);
     }
 }
