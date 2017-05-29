@@ -8,43 +8,45 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-
 import com.sn1006.atkins.sprint.data.SessionContract;
 import com.sn1006.atkins.sprint.data.SessionDbHelper;
 
 
 //Implements interface from SessionListAdapter to handle clicks on the recyclerview views
-public class SessionListActivity extends AppCompatActivity implements SessionListAdapter.SessionAdapterOnClickHandler {
+public class SessionListActivity extends AppCompatActivity
+        implements SessionListAdapter.SessionAdapterOnClickHandler {
 
     private SessionListAdapter mAdapter;
     private SQLiteDatabase mDb;
+    private RecyclerView mSessionRecyclerView;
+    private Cursor mCursor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_session_list);
 
-
         //Initiation of the recyclerview for the session list
-        RecyclerView sessionRecyclerView;
-        sessionRecyclerView = (RecyclerView) this.findViewById(R.id.all_session_list_view);
-        sessionRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mSessionRecyclerView = (RecyclerView) this.findViewById(R.id.all_session_list_view);
+        mSessionRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         SessionDbHelper dbHelper = new SessionDbHelper(this);
 
         mDb = dbHelper.getReadableDatabase();
 
         //Pulls the session list from the database (readable)
-        Cursor cursor = getSessionList();
+        mCursor = getSessionList();
 
         //Initiates and sets the SessionListAdapter for the recyclerview
-        mAdapter = new SessionListAdapter(this, cursor, this);
-        sessionRecyclerView.setAdapter(mAdapter);
+        mAdapter = new SessionListAdapter(this, mCursor, this);
+        mSessionRecyclerView.setAdapter(mAdapter);
     }
+
 
     //Query for retrieving the sessionlist
     protected Cursor getSessionList() {
@@ -76,9 +78,28 @@ public class SessionListActivity extends AppCompatActivity implements SessionLis
         Context context = this;
         Class destinationClass = LapListActivity.class;
         Intent intentToStartDetailActivity = new Intent(context, destinationClass);
-        String s = String.valueOf(clickedItemIndex);
+        String s = String.valueOf(clickedItemIndex-1);
         intentToStartDetailActivity.putExtra(Intent.EXTRA_TEXT, s);
         startActivity(intentToStartDetailActivity);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        //Initiation of the recyclerview for the session list
+        mSessionRecyclerView = (RecyclerView) this.findViewById(R.id.all_session_list_view);
+        mSessionRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        SessionDbHelper dbHelper = new SessionDbHelper(this);
+
+        mDb = dbHelper.getReadableDatabase();
+
+        //Pulls the session list from the database (readable)
+        mCursor = getSessionList();
+
+        //Initiates and sets the SessionListAdapter for the recyclerview
+        mAdapter = new SessionListAdapter(this, mCursor, this);
+        mSessionRecyclerView.setAdapter(mAdapter);
     }
 
     @Override
@@ -98,4 +119,6 @@ public class SessionListActivity extends AppCompatActivity implements SessionLis
         }
         return super.onOptionsItemSelected(item);
     }
+
+
 }

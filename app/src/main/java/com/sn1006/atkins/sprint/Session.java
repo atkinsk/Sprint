@@ -1,5 +1,6 @@
 package com.sn1006.atkins.sprint;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -32,10 +33,6 @@ public class Session {
         this.laptimes = new ArrayList<Long>();
         this.dateStamp = c.getInstance().getTime();
         this.driver = "@string/pref_driver_default";
-    }
-
-    public String getBestLap() {
-        return "" + this.bestLap;
     }
 
     public String getTrackName() {
@@ -101,10 +98,10 @@ public class Session {
         millis = (int) (laptime - mins*60000 - secs*1000);
 
         return (String.format("%02d",mins) + ":" + String.format("%02d",secs) + ":"
-                + String.format("%02d",millis));
+                + String.format("%03d",millis));
     }
 
-    //prints out list of all laptimes in the session, with the best lap in bold
+/*    //prints out list of all laptimes in the session, with the best lap in bold
     @Override
     public String toString() {
         String laptimesAsString = "";
@@ -121,5 +118,30 @@ public class Session {
         }
 
         return laptimesAsString;
+    }*/
+
+    public void convertStringToArray(String str) {
+        this.laptimes.clear();
+        if(!str.equals("")) {
+            for (String s : str.split(",")) {
+                this.laptimes.add(Long.parseLong(s));
+            }
+        }
+    }
+
+    public void setBestLap (String bestLap){
+        this.bestLap = Long.parseLong(bestLap);
+    }
+
+    public Long getLastLapLong(){
+        return this.laptimes.get(this.laptimes.size()-1);
+    }
+
+    public String getBestLapString() {
+        return "" + this.bestLap;
+    }
+
+    public Long getBestLapLong(){
+        return this.bestLap;
     }
 }
