@@ -22,7 +22,7 @@ public class TrackData {
 
     public static double getLon(String track) {
         if(track.equals("Watkins Glen International")) {
-            return -76.928892;
+            return -76.928877;
         }
         else if(track.equals("test")) {
             return -75.856780;

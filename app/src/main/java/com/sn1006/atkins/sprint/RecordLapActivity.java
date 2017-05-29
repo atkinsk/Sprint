@@ -59,8 +59,7 @@ public class RecordLapActivity extends AppCompatActivity implements
 
     protected SQLiteDatabase mDb;
 
-    protected TextView mDistanceFromWaypointText;
-    protected TextView mZoneStatusText;
+   //protected TextView mDistanceFromWaypointText;
     protected TextView mCurrentLapTimeText;
     protected TextView mPreviousLapTimeText;
     protected TextView mBestLapTimeText;
@@ -132,7 +131,7 @@ public class RecordLapActivity extends AppCompatActivity implements
         mySession.setTrack(track);
 
 //        mZoneStatusText = (TextView) findViewById(R.id.zoneStatus);
-        mDistanceFromWaypointText = (TextView) findViewById(R.id.distWaypoint);
+       // mDistanceFromWaypointText = (TextView) findViewById(R.id.distWaypoint);
 
         //Production UI Layout
         mCurrentLapTimeText = (TextView) findViewById(R.id.currentLapTime);
@@ -344,10 +343,10 @@ public class RecordLapActivity extends AppCompatActivity implements
 
     //Sets the UI values for the latitude and longitude
     protected void updateLocationUI() {
-        if (mCurrentLocation != null) {
+/*        if (mCurrentLocation != null) {
             mDistanceFromWaypointText.setText(String.format("%s: %f", "Dist from WP", mDistanceFromWaypoint));
-           // mZoneStatusText.setText("IN THE ZONE? " + mIsInZone);
-        }
+            mZoneStatusText.setText("IN THE ZONE? " + mIsInZone);
+        }*/
     }
 
     //Specification of the priority and update interval for the location request
@@ -419,7 +418,7 @@ public class RecordLapActivity extends AppCompatActivity implements
      * METHOD UNLESS USING A CAR
     * ---------------------------------------------------------------------------------------
     * */
-    /*protected void isUserInStartZone() {
+    protected void isUserInStartZone() {
 
         //Checks to see if the user is in the specified radius near the start / end point
         if (mDistanceFromWaypoint < mZoneSize) {
@@ -430,7 +429,7 @@ public class RecordLapActivity extends AppCompatActivity implements
             mWaypointBearing = mCurrentLocation.bearingTo(mWaypoint);
             mPreviousWaypointBearing = mPreviousLocation.bearingTo(mWaypoint);
             //When the timer is not running, start the timer. This will only trigger on the first lap
-            if (!t.getRunning() isUserPastStartPoint()) {
+            if (!t.getRunning() && isUserPastStartPoint()) {
                 //Calculates the time between the current location which triggered the timer to start
                 //and the approximate time the user would have crossed the start line
                 mStartTimeMod = t.getTimeBetweenGpsPing(mCurrentLocation, mPreviousLocation)
@@ -442,7 +441,7 @@ public class RecordLapActivity extends AppCompatActivity implements
             //already left the start zone and returned to it. This keeps the timer from stopping
             //if the GPS coordinates of the user are in the start zone for two GPS pings
             //Also checks to see if the user has crossed the start point via bearings delta
-            if (t.getRunning() && mHasLeftZone isUserPastStartPoint()) {
+            if (t.getRunning() && mHasLeftZone && isUserPastStartPoint()) {
                 //Calculates the time between the current location which triggered the timer to stop
                 //and the approximate time the user would have crossed the finish line
                 long finishTimeMod = t.getTimeBetweenGpsPing(mCurrentLocation, mPreviousLocation)
@@ -451,7 +450,6 @@ public class RecordLapActivity extends AppCompatActivity implements
                 t.stop();
                 //Resets the logic that the user has left the zone
                 mHasLeftZone = false;
-
 
                 //Modifies the lap time to subtract both the modifiers from the lap start
                 //and lap finish
@@ -476,14 +474,15 @@ public class RecordLapActivity extends AppCompatActivity implements
             }
         }
     }
-*/
+
+
     /*---------------------------------------------------------------------------------------
     * THIS IS A TESTING FUNCTION FOR THE TIMING FUNCTIONALITY. IF THE TIMING MODIFIER CALCULATIONS
     * ARE INCLUDED WHILE FINISHING LAPS WITHOUT CALLING ISUSERPASTSTARTPOINT, THE DATA WILL
     * BE GARBAGE. GENERIC TESTS FOR APP FUNCTIONALITY SHOULD USE THIS METHOD UNLESS USING A CAR
     * ---------------------------------------------------------------------------------------
     * */
-    protected void isUserInStartZone() {
+/*    protected void isUserInStartZone() {
         //test code
         if (!t.getRunning()) {
             t.start();
@@ -532,7 +531,7 @@ public class RecordLapActivity extends AppCompatActivity implements
             mIsInZone = false;
             mHasLeftZone = true;
         }
-    }
+    }*/
 
     //Determines if the user has past the start / end point
     protected boolean isUserPastStartPoint() {
@@ -699,8 +698,7 @@ public class RecordLapActivity extends AppCompatActivity implements
         NotificationCompat.Builder mBuilder = (android.support.v7.app.NotificationCompat.Builder) new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.road)
                 .setContentTitle("Sprint LT is recording your session")
-                .setContentText(mySession.getTrackName())
-                .setOngoing(true);
+                .setContentText(mySession.getTrackName());
                // .setContentIntent(pendingIntent);
 
         NotificationManager mNotificationManager =
