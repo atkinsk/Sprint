@@ -59,11 +59,13 @@ public class RecordLapActivity extends AppCompatActivity implements
 
     protected SQLiteDatabase mDb;
 
-   //protected TextView mDistanceFromWaypointText;
+   protected TextView mDistanceFromWaypointText;
     protected TextView mCurrentLapTimeText;
     protected TextView mPreviousLapTimeText;
     protected TextView mBestLapTimeText;
     protected TextView mCurrentTrackText;
+    protected TextView mNumberUpdates;
+    protected int mNum ;
 
     protected Location mCurrentLocation;
     protected Location mPreviousLocation;
@@ -88,7 +90,7 @@ public class RecordLapActivity extends AppCompatActivity implements
     protected final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 23;
 
     //set size of zone for testing waypoint arrival/departure
-    protected double mZoneSize = 29; //meters
+    protected double mZoneSize = 150; //meters
     protected boolean mIsInZone = false; //User is in the above listed radius in relation to start zone
     protected boolean mHasLeftZone = false; //User has left the start zone after triggering the timer
 
@@ -131,13 +133,14 @@ public class RecordLapActivity extends AppCompatActivity implements
         mySession.setTrack(track);
 
 //        mZoneStatusText = (TextView) findViewById(R.id.zoneStatus);
-       // mDistanceFromWaypointText = (TextView) findViewById(R.id.distWaypoint);
+        mDistanceFromWaypointText = (TextView) findViewById(R.id.distWaypoint);
 
         //Production UI Layout
         mCurrentLapTimeText = (TextView) findViewById(R.id.currentLapTime);
         mPreviousLapTimeText= (TextView) findViewById(R.id.previousLapTime);
         mBestLapTimeText = (TextView) findViewById(R.id.bestLapTime);
         mCurrentTrackText = (TextView) findViewById(R.id.trackName);
+        mNumberUpdates = (TextView) findViewById(R.id.numUpdates);
 
         mCurrentTrackText.setText(mySession.getTrackName());
 
@@ -343,10 +346,11 @@ public class RecordLapActivity extends AppCompatActivity implements
 
     //Sets the UI values for the latitude and longitude
     protected void updateLocationUI() {
-/*        if (mCurrentLocation != null) {
-            mDistanceFromWaypointText.setText(String.format("%s: %f", "Dist from WP", mDistanceFromWaypoint));
-            mZoneStatusText.setText("IN THE ZONE? " + mIsInZone);
-        }*/
+       if (mCurrentLocation != null) {
+           mDistanceFromWaypointText.setText(String.format("%s: %f", "Dist from WP", mDistanceFromWaypoint));
+           //  mZoneStatusText.setText("IN THE ZONE? " + mIsInZone);
+           mNumberUpdates.setText(String.valueOf(mNum));
+       }
     }
 
     //Specification of the priority and update interval for the location request
@@ -432,8 +436,8 @@ public class RecordLapActivity extends AppCompatActivity implements
             if (!t.getRunning() && isUserPastStartPoint()) {
                 //Calculates the time between the current location which triggered the timer to start
                 //and the approximate time the user would have crossed the start line
-                mStartTimeMod = t.getTimeBetweenGpsPing(mCurrentLocation, mPreviousLocation)
-                        - t.finishTimeEstimate(mCurrentLocation, mPreviousLocation);
+/*                mStartTimeMod = t.getTimeBetweenGpsPing(mCurrentLocation, mPreviousLocation)
+                        - t.finishTimeEstimate(mCurrentLocation, mPreviousLocation);*/
                 t.start();
                 handler.postDelayed(updater, 30);
             }
@@ -444,8 +448,8 @@ public class RecordLapActivity extends AppCompatActivity implements
             if (t.getRunning() && mHasLeftZone && isUserPastStartPoint()) {
                 //Calculates the time between the current location which triggered the timer to stop
                 //and the approximate time the user would have crossed the finish line
-                long finishTimeMod = t.getTimeBetweenGpsPing(mCurrentLocation, mPreviousLocation)
-                        - t.finishTimeEstimate(mCurrentLocation, mPreviousLocation);
+/*                long finishTimeMod = t.getTimeBetweenGpsPing(mCurrentLocation, mPreviousLocation)
+                        - t.finishTimeEstimate(mCurrentLocation, mPreviousLocation);*/
                 //stops the timer for this lap
                 t.stop();
                 //Resets the logic that the user has left the zone
@@ -453,14 +457,14 @@ public class RecordLapActivity extends AppCompatActivity implements
 
                 //Modifies the lap time to subtract both the modifiers from the lap start
                 //and lap finish
-                mySession.addLap(t.getLaptime() - mStartTimeMod - finishTimeMod);
+                mySession.addLap(t.getLaptime() /*- mStartTimeMod - finishTimeMod*/);
 
                 //update laptimes textview with a list of the session's laptimes
                 mPreviousLapTimeText.setText(mySession.formatLaptime(mySession.getLastLapLong()));
                 mBestLapTimeText.setText(mySession.formatLaptime(mySession.getBestLapLong()));
 
                 //Sets the modifier for the lap start to the previous lap's lap finish modifier
-                mStartTimeMod = finishTimeMod;
+ /*               mStartTimeMod = finishTimeMod;*/
 
                 //Restarts the timer for the next lap
                 t.start();
@@ -482,7 +486,7 @@ public class RecordLapActivity extends AppCompatActivity implements
     * BE GARBAGE. GENERIC TESTS FOR APP FUNCTIONALITY SHOULD USE THIS METHOD UNLESS USING A CAR
     * ---------------------------------------------------------------------------------------
     * */
-/*    protected void isUserInStartZone() {
+   /* protected void isUserInStartZone() {
         //test code
         if (!t.getRunning()) {
             t.start();
@@ -601,6 +605,7 @@ public class RecordLapActivity extends AppCompatActivity implements
                     mDistanceTravelled = mCurrentLocation.distanceTo(mPreviousLocation);*/
         //Distance from current location to waypoint location
         mDistanceFromWaypoint = mCurrentLocation.distanceTo(mWaypoint);
+        mNum++;
 
         //Controls lap timer functionality based on location relative to the user and the waypoint
         isUserInStartZone();
