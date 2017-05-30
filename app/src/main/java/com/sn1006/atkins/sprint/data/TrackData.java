@@ -9,7 +9,7 @@ package com.sn1006.atkins.sprint.data;
 public class TrackData {
 
     public static double getLat(String track) {
-        if(track.equals("Watkins Glen International")) {
+        if(track.equals("wgi")) {
             return 42.341043;
         }
         else if(track.equals("test")) {
@@ -21,7 +21,7 @@ public class TrackData {
     }
 
     public static double getLon(String track) {
-        if(track.equals("Watkins Glen International")) {
+        if(track.equals("wgi")) {
             return -76.928877;
         }
         else if(track.equals("test")) {

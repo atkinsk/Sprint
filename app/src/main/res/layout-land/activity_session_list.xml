@@ -10,12 +10,15 @@
 
     <com.chauthai.overscroll.RecyclerViewBouncy
         android:id="@+id/all_session_list_view"
-        android:layout_width="640dp"
-        android:layout_height="366dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         android:layout_marginLeft="0dp"
         android:layout_marginTop="0dp"
+        android:layout_marginRight="0dp"
+        android:overScrollMode="always"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/floatingActionButton6"
