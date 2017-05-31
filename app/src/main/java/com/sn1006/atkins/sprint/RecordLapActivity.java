@@ -436,8 +436,8 @@ public class RecordLapActivity extends AppCompatActivity implements
             if (!t.getRunning() && isUserPastStartPoint()) {
                 //Calculates the time between the current location which triggered the timer to start
                 //and the approximate time the user would have crossed the start line
-/*                mStartTimeMod = t.getTimeBetweenGpsPing(mCurrentLocation, mPreviousLocation)
-                        - t.finishTimeEstimate(mCurrentLocation, mPreviousLocation);*/
+                mStartTimeMod = t.getTimeBetweenGpsPing(mCurrentLocation, mPreviousLocation)
+                        - t.finishTimeEstimate(mCurrentLocation, mPreviousLocation, mWaypoint);
                 t.start();
                 handler.postDelayed(updater, 30);
             }
@@ -448,8 +448,8 @@ public class RecordLapActivity extends AppCompatActivity implements
             if (t.getRunning() && mHasLeftZone && isUserPastStartPoint()) {
                 //Calculates the time between the current location which triggered the timer to stop
                 //and the approximate time the user would have crossed the finish line
-/*                long finishTimeMod = t.getTimeBetweenGpsPing(mCurrentLocation, mPreviousLocation)
-                        - t.finishTimeEstimate(mCurrentLocation, mPreviousLocation);*/
+                long finishTimeMod = t.getTimeBetweenGpsPing(mCurrentLocation, mPreviousLocation)
+                        - t.finishTimeEstimate(mCurrentLocation, mPreviousLocation, mWaypoint);
                 //stops the timer for this lap
                 t.stop();
                 //Resets the logic that the user has left the zone
@@ -457,14 +457,14 @@ public class RecordLapActivity extends AppCompatActivity implements
 
                 //Modifies the lap time to subtract both the modifiers from the lap start
                 //and lap finish
-                mySession.addLap(t.getLaptime() /*- mStartTimeMod - finishTimeMod*/);
+                mySession.addLap(t.getLaptime() - mStartTimeMod - finishTimeMod);
 
                 //update laptimes textview with a list of the session's laptimes
                 mPreviousLapTimeText.setText(mySession.formatLaptime(mySession.getLastLapLong()));
                 mBestLapTimeText.setText(mySession.formatLaptime(mySession.getBestLapLong()));
 
                 //Sets the modifier for the lap start to the previous lap's lap finish modifier
- /*               mStartTimeMod = finishTimeMod;*/
+                mStartTimeMod = finishTimeMod;
 
                 //Restarts the timer for the next lap
                 t.start();
