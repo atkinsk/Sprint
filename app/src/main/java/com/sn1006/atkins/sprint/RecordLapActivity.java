@@ -683,6 +683,14 @@ public class RecordLapActivity extends AppCompatActivity implements
         Intent saveSessionIntent = new Intent(this, RecordingIntentService.class);
         //Set the action of the intent to ACTION_SAVE_SESSION
         saveSessionIntent.setAction(RecordLapTasks.ACTION_SAVE_SESSION);
+
+        //add the current session object info to the intent so it can be retrieved
+        saveSessionIntent.putExtra("session_driver", mySession.getDriver());
+        saveSessionIntent.putExtra("session_track", mySession.getTrackName());
+        saveSessionIntent.putExtra("session_bestLap", mySession.getBestLapString());
+        saveSessionIntent.putExtra("session_laptimes", mySession.getLaptimesAsString());
+        saveSessionIntent.putExtra("session_numLaps", mySession.getNumberOfLaps());
+
         //Call startService and pass the explicit intent
         startService(saveSessionIntent);
     }

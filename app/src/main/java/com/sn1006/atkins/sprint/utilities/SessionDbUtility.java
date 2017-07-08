@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.preference.PreferenceManager;
 
+import com.sn1006.atkins.sprint.Session;
 import com.sn1006.atkins.sprint.data.SessionContract;
 import com.sn1006.atkins.sprint.data.SessionDbHelper;
 
@@ -16,13 +17,13 @@ import com.sn1006.atkins.sprint.data.SessionDbHelper;
 
 public class SessionDbUtility {
 
-    protected SQLiteDatabase mDb;
+    protected static SQLiteDatabase mDb;
 
     //variables to be loaded from shared preferences... may not need these if can access existing session object
     protected String driverName;
     protected String track;
 
-    public long saveSession(Context context) {
+    public static long saveSession(Context context, String driver, String track, String bestLap, String laptimes, String numLaps) {
         SessionDbHelper dbHelper = new SessionDbHelper(context);
         mDb = dbHelper.getReadableDatabase();
 
@@ -32,11 +33,11 @@ public class SessionDbUtility {
         //on subsequent put, if same session, should just overwrite
         ContentValues cv = new ContentValues();
 
-        cv.put(SessionContract.SessionEntry.COLUMN_TRACKNAME, mySession.getTrackName());
-        cv.put(SessionContract.SessionEntry.COLUMN_DRIVER, mySession.getDriver());
-        cv.put(SessionContract.SessionEntry.COLUMN_BESTLAP, mySession.getBestLapString());
-        cv.put(SessionContract.SessionEntry.COLUMN_LAPTIMES, mySession.getLaptimesAsString());
-        cv.put(SessionContract.SessionEntry.COLUMN_NUMBEROFLAPS, mySession.getNumberOfLaps());
+        cv.put(SessionContract.SessionEntry.COLUMN_TRACKNAME, track);
+        cv.put(SessionContract.SessionEntry.COLUMN_DRIVER, driver);
+        cv.put(SessionContract.SessionEntry.COLUMN_BESTLAP, bestLap);
+        cv.put(SessionContract.SessionEntry.COLUMN_LAPTIMES, laptimes);
+        cv.put(SessionContract.SessionEntry.COLUMN_NUMBEROFLAPS, numLaps);
 
         //insert query
         return mDb.insert(SessionContract.SessionEntry.TABLE_NAME, null, cv);
