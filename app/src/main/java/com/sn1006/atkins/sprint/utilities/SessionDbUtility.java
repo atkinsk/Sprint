@@ -22,7 +22,7 @@ public class SessionDbUtility {
     protected String driverName;
     protected String track;
 
-    private long saveSession(Context context) {
+    public long saveSession(Context context) {
         SessionDbHelper dbHelper = new SessionDbHelper(context);
         mDb = dbHelper.getReadableDatabase();
 

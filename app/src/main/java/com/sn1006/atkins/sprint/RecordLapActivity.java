@@ -43,6 +43,8 @@ import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.sn1006.atkins.sprint.data.SessionContract;
 import com.sn1006.atkins.sprint.data.SessionDbHelper;
 import com.sn1006.atkins.sprint.data.TrackData;
+import com.sn1006.atkins.sprint.sync.RecordLapTasks;
+import com.sn1006.atkins.sprint.sync.RecordingIntentService;
 
 import android.support.v7.app.AppCompatActivity;
 
@@ -674,6 +676,17 @@ public class RecordLapActivity extends AppCompatActivity implements
             toast.show();
         }
     }
+
+    //creates a background task in which to add the session to the db
+    public void addNewSession() {
+        //Create an explicit intent for RecordingIntentService
+        Intent saveSessionIntent = new Intent(this, RecordingIntentService.class);
+        //Set the action of the intent to ACTION_SAVE_SESSION
+        saveSessionIntent.setAction(RecordLapTasks.ACTION_SAVE_SESSION);
+        //Call startService and pass the explicit intent
+        startService(saveSessionIntent);
+    }
+
 /*MOVED TO SessionDbUtility
     //Adds session to the local SQL database
     private long addNewSession() {
