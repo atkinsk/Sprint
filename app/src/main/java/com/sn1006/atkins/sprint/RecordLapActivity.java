@@ -56,10 +56,10 @@ public class RecordLapActivity extends AppCompatActivity implements
 
     protected GoogleApiClient mGoogleApiClient;
     protected static final String TAG = "MainActivity";
+//sent to utilities
+    //protected SQLiteDatabase mDb;
 
-    protected SQLiteDatabase mDb;
-
-   protected TextView mDistanceFromWaypointText;
+    protected TextView mDistanceFromWaypointText;
     protected TextView mCurrentLapTimeText;
     protected TextView mPreviousLapTimeText;
     protected TextView mBestLapTimeText;
@@ -152,14 +152,15 @@ public class RecordLapActivity extends AppCompatActivity implements
         mWaypoint.setLatitude(TrackData.getLat(track));
         mWaypoint.setLongitude(TrackData.getLon(track));
 
+/*MOVED TO UTILITY
         SessionDbHelper dbHelper = new SessionDbHelper(this);
         mDb = dbHelper.getReadableDatabase();
+*/
 
         //implement continuously updating timer
         //human eye can register only as fast as every 30ms... so that's how often we will update
         //use an event handler to schedule the posting of the time at delayed intervals (30ms)
         //implement runnable interface to set the text
-
 
         buildGoogleApiClient();
         createLocationRequest();
@@ -207,6 +208,7 @@ public class RecordLapActivity extends AppCompatActivity implements
         }
     }
 
+//UTILITIES?
     private void setupSharedPreferences() {
         //get all the values from the SharedPreferences to use in the session
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -215,6 +217,7 @@ public class RecordLapActivity extends AppCompatActivity implements
         setDriver(sharedPreferences);
         setTrack(sharedPreferences);
     }
+
 
     private void setDriver(SharedPreferences sharedPreferences) {
         driverName = sharedPreferences.getString(getString(R.string.pref_driver_key),
@@ -671,7 +674,7 @@ public class RecordLapActivity extends AppCompatActivity implements
             toast.show();
         }
     }
-
+/*MOVED TO SessionDbUtility
     //Adds session to the local SQL database
     private long addNewSession() {
         ContentValues cv = new ContentValues();
@@ -685,7 +688,7 @@ public class RecordLapActivity extends AppCompatActivity implements
         //insert query
         return mDb.insert(SessionContract.SessionEntry.TABLE_NAME, null, cv);
     }
-
+*/
     //Intent to return the user to the SessionlistActivity
     public void returnToSessionList() {
         Context context = this;
