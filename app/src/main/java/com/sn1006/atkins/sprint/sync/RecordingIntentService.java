@@ -3,8 +3,6 @@ package com.sn1006.atkins.sprint.sync;
 import android.app.IntentService;
 import android.content.Intent;
 
-import com.sn1006.atkins.sprint.Session;
-
 /**
  * Created by jonathanbrooks on 2017-06-27.
  *

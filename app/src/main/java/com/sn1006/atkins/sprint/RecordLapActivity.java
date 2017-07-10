@@ -24,6 +24,7 @@ import android.support.v7.app.NotificationCompat;
 import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -210,7 +211,6 @@ public class RecordLapActivity extends AppCompatActivity implements
         }
     }
 
-//UTILITIES?
     private void setupSharedPreferences() {
         //get all the values from the SharedPreferences to use in the session
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -665,7 +665,7 @@ public class RecordLapActivity extends AppCompatActivity implements
             Context context = this;
             Class destinationClass = LapListActivity.class;
             Intent intentToStartDetailActivity = new Intent(context, destinationClass);
-            startActivity(intentToStartDetailActivity);
+//            startActivity(intentToStartDetailActivity);
         } else {
             //Brings user to sessionListActivity and returns a toast to say no laps were recorded
             //and nothing has been saved to the database
@@ -740,5 +740,24 @@ public class RecordLapActivity extends AppCompatActivity implements
     public void cancelRecordingNotification(){
         NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.cancel(mRecordingNotificationID);
+    }
+
+    /******************************************************************
+    TEST BUTTONS TO FAKE DATA FOR STARTING SESSION AND COMPLETING LAPS
+     ******************************************************************/
+    public void testStart(View view) {
+        //Toast.makeText(RecordLapActivity.this, "TESTING START BUTTON", Toast.LENGTH_LONG).show();
+        mIsInZone = true;
+        t.start();
+        handler.postDelayed(updater, 30);
+    }
+
+    public void testEndLap(View view) {
+        t.stop();
+        mySession.addLap(t.getLaptime());
+        mPreviousLapTimeText.setText(mySession.formatLaptime(mySession.getLastLapLong()));
+        mBestLapTimeText.setText(mySession.formatLaptime(mySession.getBestLapLong()));
+        t.start();
+        handler.postDelayed(updater, 30);
     }
 }

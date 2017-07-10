@@ -19,10 +19,6 @@ public class SessionDbUtility {
 
     protected static SQLiteDatabase mDb;
 
-    //variables to be loaded from shared preferences... may not need these if can access existing session object
-    protected String driverName;
-    protected String track;
-
     public static long saveSession(Context context, String driver, String track, String bestLap, String laptimes, String numLaps) {
         SessionDbHelper dbHelper = new SessionDbHelper(context);
         mDb = dbHelper.getReadableDatabase();

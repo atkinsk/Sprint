@@ -1,10 +1,6 @@
 package com.sn1006.atkins.sprint.sync;
 
-import android.content.ContentValues;
 import android.content.Context;
-
-import com.sn1006.atkins.sprint.Session;
-import com.sn1006.atkins.sprint.data.SessionContract;
 import com.sn1006.atkins.sprint.utilities.SessionDbUtility;
 
 /**

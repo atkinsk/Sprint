@@ -145,5 +145,27 @@
         app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginBottom="24dp" />
 
+    <Button android:id="@+id/testStart"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:text="START"
+        android:onClick="testStart"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="8dp"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintLeft_toLeftOf="parent" />
+
+    <Button android:id="@+id/testEndLap"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:text="LAP"
+        android:onClick="testEndLap"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@+id/testStart"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintLeft_toLeftOf="parent" />
+
 
 </android.support.constraint.ConstraintLayout>
