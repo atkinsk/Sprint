@@ -13,4 +13,10 @@
         android:key="@string/pref_track_key"
         android:title="@string/pref_track_label" />
 
+    <com.sn1006.atkins.sprint.preference.TrackDataPreference
+        android:defaultValue="wgi"
+        android:key="pref_trackdatapreference"
+        android:title="@string/trackdatapreference"
+        android:summary="@string/trackdatapreference_summary" />
+
 </PreferenceScreen>

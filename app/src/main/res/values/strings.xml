@@ -48,5 +48,9 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="title_activity_navigation">Navigation</string>
 
+    <!-- STRINGS FOR CUSTOM TRACK DATA PREFERENCE -->
+    <string name="trackdatapreference">Select Track</string>
+    <string name="trackdatapreference_summary">Please select your track from the list below</string>
+
 
 </resources>
