@@ -7,7 +7,7 @@
         android:title="@string/pref_driver_label" />
 
     <com.sn1006.atkins.sprint.preference.TrackDataPreference
-        android:key="pref_trackdatapreference"
+        android:key="@string/pref_track_key"
         android:title="@string/trackdatapreference"
         android:summary="@string/trackdatapreference_summary" />
 

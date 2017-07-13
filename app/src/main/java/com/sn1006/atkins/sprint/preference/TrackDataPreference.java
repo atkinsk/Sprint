@@ -42,14 +42,14 @@ public class TrackDataPreference extends ListPreference {
     //get list of track entry values from track_data.csv and return to constructor
     private String[] entryValues() {
 
-        String[] entryList = fetcher.getTracks(getContext(), 2);
+        String[] entryList = fetcher.getTracks(getContext(), 1);  //<-- right now using col 1, we want full track name as value, not short form
 
         return entryList;
     }
 
     //set default value - retrieved from shared preferences if previously set by user
     private int initializeIndex() {
-        int index = 1;
+        int index = 0;
 
         return index;
     }

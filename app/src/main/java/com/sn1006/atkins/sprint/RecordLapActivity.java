@@ -145,8 +145,9 @@ public class RecordLapActivity extends AppCompatActivity implements
         updateValuesFromBundle(savedInstanceState);
 
         //create Location object for start/stop point
-        mWaypoint.setLatitude(TrackDataCSVHelper.getLat(track));
-        mWaypoint.setLongitude(TrackDataCSVHelper.getLon(track));
+        TrackDataCSVHelper myCSV = new TrackDataCSVHelper();
+        mWaypoint.setLatitude(myCSV.getLat(track, this));
+        mWaypoint.setLongitude(myCSV.getLon(track, this));
 
 /*MOVED TO UTILITY
         SessionDbHelper dbHelper = new SessionDbHelper(this);
@@ -345,6 +346,8 @@ public class RecordLapActivity extends AppCompatActivity implements
     //Sets the UI values for the latitude and longitude
     protected void updateLocationUI() {
        if (mCurrentLocation != null) {
+           TrackDataCSVHelper myCSV2 = new TrackDataCSVHelper();
+           //mDistanceFromWaypointText.setText(String.valueOf(myCSV2.getLon(track, this))); //<-- used this to test getting proper lat/lon
            mDistanceFromWaypointText.setText(String.format("%s: %f", "Dist from WP", mDistanceFromWaypoint));
            //  mZoneStatusText.setText("IN THE ZONE? " + mIsInZone);
            mNumberUpdates.setText(String.valueOf(mNum));

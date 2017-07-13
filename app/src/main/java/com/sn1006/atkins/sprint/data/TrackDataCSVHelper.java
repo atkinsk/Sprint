@@ -88,27 +88,60 @@ public class TrackDataCSVHelper {
         }
     }
 
-    public static double getLat(String track) {
-        if(track.equals("wgi")) {
-            return 42.341043;
+    public double getLat(String track, Context context) {
+        //need to get latitude from csv file using given track name
+        //name is in col 1
+        //latitude is in col 3
+        //**note will be a string! need to parseInt
+
+        InputStream inputStream = context.getResources().openRawResource(R.raw.track_data);
+        CSVFile csvFile = new CSVFile(inputStream);
+        List<String[]> trackList = csvFile.read();
+
+        //now we have the list of string arrays representing the entire track table, time to return appropriate row for this track!
+        //go through and check col 1 for track match, store that row
+        int numEntries = trackList.size();
+        int row = -1;
+        double lat = 0.00;
+
+        for(int i = 0; i < numEntries; i++) {
+            if(track.equals(trackList.get(i)[1])) {
+                row = i;
+            }
         }
-        else if(track.equals("test")) {
-            return 45.293715;
+
+        if(row != -1) {
+            lat = Double.parseDouble(trackList.get(row)[3]);
         }
-        else {
-            return 0.00;
-        }
+
+        return lat;
     }
 
-    public static double getLon(String track) {
-        if(track.equals("wgi")) {
-            return -76.928877;
+    public double getLon(String track, Context context) {
+        //need to get longitude from csv file using given track name
+        //name is in col 1
+        //latitude is in col 4
+
+        InputStream inputStream = context.getResources().openRawResource(R.raw.track_data);
+        CSVFile csvFile = new CSVFile(inputStream);
+        List<String[]> trackList = csvFile.read();
+
+        //now we have the list of string arrays representing the entire track table, time to return appropriate row for this track!
+        //go through and check col 1 for track match, store that row
+        int numEntries = trackList.size();
+        int row = -1;
+        double lon = 5.00;
+
+        for(int i = 0; i < numEntries; i++) {
+            if(track.equals(trackList.get(i)[1])) {
+                row = i;
+            }
         }
-        else if(track.equals("test")) {
-            return -75.856780;
+
+        if(row != -1) {
+            lon = Double.parseDouble(trackList.get(row)[4]);
         }
-        else {
-            return 0.00;
-        }
+
+        return lon;
     }
 }
