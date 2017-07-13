@@ -5,11 +5,19 @@ import android.content.Context;
 import android.support.v7.preference.ListPreference;
 import android.util.AttributeSet;
 
+import com.sn1006.atkins.sprint.data.TrackDataCSVHelper;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by jonathanbrooks on 2017-07-12.
  */
 
 public class TrackDataPreference extends ListPreference {
+
+    TrackDataCSVHelper fetcher = new TrackDataCSVHelper();
 
     public TrackDataPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -26,17 +34,17 @@ public class TrackDataPreference extends ListPreference {
     //get list of track names from track_data.csv and return to constructor
     private String[] entries() {
 
-        String[] trackEntries = {"Watkins Glen", "Mosport"};
+        String[] trackList = fetcher.getTracks(getContext(), 1);
 
-        return trackEntries;
+        return trackList;
     }
 
     //get list of track entry values from track_data.csv and return to constructor
     private String[] entryValues() {
 
-        String[] trackValues = {"wgi", "ctmp"};
+        String[] entryList = fetcher.getTracks(getContext(), 2);
 
-        return trackValues;
+        return entryList;
     }
 
     //set default value - retrieved from shared preferences if previously set by user

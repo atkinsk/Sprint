@@ -1,17 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Label ordering must match values -->
-    <array name="pref_track_option_labels">
-        <item>@string/pref_track_label_wgi</item>
-        <item>@string/pref_track_label_ctmp</item>
-        <item>@string/pref_track_label_bogie</item>
-        <item>@string/pref_track_label_test</item>
-    </array>
-
-    <array name="pref_track_option_values">
-        <item>@string/pref_track_wgi_value</item>
-        <item>@string/pref_track_ctmp_value</item>
-        <item>@string/pref_track_bogie_value</item>
-        <item>@string/pref_track_test_value</item>
-    </array>
+    <!-- not used, used to have track entries -->
 </resources>
