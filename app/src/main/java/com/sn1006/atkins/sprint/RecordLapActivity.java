@@ -59,8 +59,6 @@ public class RecordLapActivity extends AppCompatActivity implements
 
     protected GoogleApiClient mGoogleApiClient;
     protected static final String TAG = "MainActivity";
-//sent to utilities
-    //protected SQLiteDatabase mDb;
 
     protected TextView mDistanceFromWaypointText;
     protected TextView mCurrentLapTimeText;
@@ -86,7 +84,7 @@ public class RecordLapActivity extends AppCompatActivity implements
     public static final long FASTEST_UPDATE_INTERVAL_IN_MS = 500; //500
 
     // Keys for storing activity state in the Bundle.
-//    protected final static String KEY_REQUESTING_LOCATION_UPDATES = "requesting-location-updates";
+    protected final static String KEY_REQUESTING_LOCATION_UPDATES = "requesting-location-updates";
     protected final static String KEY_LOCATION = "location";
 
     //Request code used for requestPermissions. Must be >=0
@@ -135,15 +133,18 @@ public class RecordLapActivity extends AppCompatActivity implements
         mySession.setDriver(driverName);
         mySession.setTrack(track);
 
-//        mZoneStatusText = (TextView) findViewById(R.id.zoneStatus);
-        mDistanceFromWaypointText = (TextView) findViewById(R.id.distWaypoint);
+        /* COMMENT OUT mZoneStatusText AND mDistanceFromWaypointText FOR PRODUCTION **
+        *  NOTE: ALSO COMMENT OUT SETTING THESE TEXT FIELDS IN updateLocationUI()   */
+
+        //mZoneStatusText = (TextView) findViewById(R.id.zoneStatus);
+        //mDistanceFromWaypointText = (TextView) findViewById(R.id.distWaypoint);
+        //mNumberUpdates = (TextView) findViewById(R.id.numUpdates);
 
         //Production UI Layout
         mCurrentLapTimeText = (TextView) findViewById(R.id.currentLapTime);
         mPreviousLapTimeText= (TextView) findViewById(R.id.previousLapTime);
         mBestLapTimeText = (TextView) findViewById(R.id.bestLapTime);
         mCurrentTrackText = (TextView) findViewById(R.id.trackName);
-        mNumberUpdates = (TextView) findViewById(R.id.numUpdates);
 
         mCurrentTrackText.setText(mySession.getTrackName());
 
@@ -154,16 +155,6 @@ public class RecordLapActivity extends AppCompatActivity implements
         //create Location object for start/stop point
         mWaypoint.setLatitude(TrackData.getLat(track));
         mWaypoint.setLongitude(TrackData.getLon(track));
-
-/*MOVED TO UTILITY
-        SessionDbHelper dbHelper = new SessionDbHelper(this);
-        mDb = dbHelper.getReadableDatabase();
-*/
-
-        //implement continuously updating timer
-        //human eye can register only as fast as every 30ms... so that's how often we will update
-        //use an event handler to schedule the posting of the time at delayed intervals (30ms)
-        //implement runnable interface to set the text
 
         buildGoogleApiClient();
         createLocationRequest();
@@ -185,6 +176,11 @@ public class RecordLapActivity extends AppCompatActivity implements
         }
     }
 
+    //implement continuously updating timer
+    //human eye can register only as fast as every 30ms... so that's how often we will update
+    //use an event handler to schedule the posting of the time at delayed intervals (30ms)
+    //implement runnable interface to set the text
+
     Runnable updater = new Runnable() {
 
         @Override
@@ -197,7 +193,6 @@ public class RecordLapActivity extends AppCompatActivity implements
             }
         }
     };
-
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -352,9 +347,9 @@ public class RecordLapActivity extends AppCompatActivity implements
     //Sets the UI values for the latitude and longitude
     protected void updateLocationUI() {
        if (mCurrentLocation != null) {
-           mDistanceFromWaypointText.setText(String.format("%s: %f", "Dist from WP", mDistanceFromWaypoint));
-           //  mZoneStatusText.setText("IN THE ZONE? " + mIsInZone);
-           mNumberUpdates.setText(String.valueOf(mNum));
+           //mDistanceFromWaypointText.setText(String.format("%s: %f", "Dist from WP", mDistanceFromWaypoint));
+           //mZoneStatusText.setText("IN THE ZONE? " + mIsInZone);
+           //mNumberUpdates.setText(String.valueOf(mNum));
        }
     }
 
@@ -665,7 +660,7 @@ public class RecordLapActivity extends AppCompatActivity implements
             Context context = this;
             Class destinationClass = LapListActivity.class;
             Intent intentToStartDetailActivity = new Intent(context, destinationClass);
-//            startActivity(intentToStartDetailActivity);
+            startActivity(intentToStartDetailActivity);
         } else {
             //Brings user to sessionListActivity and returns a toast to say no laps were recorded
             //and nothing has been saved to the database
@@ -695,21 +690,6 @@ public class RecordLapActivity extends AppCompatActivity implements
         startService(saveSessionIntent);
     }
 
-/*MOVED TO SessionDbUtility
-    //Adds session to the local SQL database
-    private long addNewSession() {
-        ContentValues cv = new ContentValues();
-
-        cv.put(SessionContract.SessionEntry.COLUMN_TRACKNAME, mySession.getTrackName());
-        cv.put(SessionContract.SessionEntry.COLUMN_DRIVER, mySession.getDriver());
-        cv.put(SessionContract.SessionEntry.COLUMN_BESTLAP, mySession.getBestLapString());
-        cv.put(SessionContract.SessionEntry.COLUMN_LAPTIMES, mySession.getLaptimesAsString());
-        cv.put(SessionContract.SessionEntry.COLUMN_NUMBEROFLAPS, mySession.getNumberOfLaps());
-
-        //insert query
-        return mDb.insert(SessionContract.SessionEntry.TABLE_NAME, null, cv);
-    }
-*/
     //Intent to return the user to the SessionlistActivity
     public void returnToSessionList() {
         Context context = this;
@@ -745,6 +725,7 @@ public class RecordLapActivity extends AppCompatActivity implements
     /******************************************************************
     TEST BUTTONS TO FAKE DATA FOR STARTING SESSION AND COMPLETING LAPS
      ******************************************************************/
+
     public void testStart(View view) {
         //Toast.makeText(RecordLapActivity.this, "TESTING START BUTTON", Toast.LENGTH_LONG).show();
         mIsInZone = true;

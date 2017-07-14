@@ -121,6 +121,8 @@
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="16dp" />
 
+    <!-- THE FOLLOWING TEXT VIEWS AND BUTTONS ARE FOR TESTING PURPOSES ONLY -->
+    <!--
     <TextView
         android:id="@+id/distWaypoint"
         android:layout_width="wrap_content"
@@ -144,6 +146,8 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginBottom="24dp" />
+
+        -->
 
     <Button android:id="@+id/testStart"
         android:layout_width="wrap_content"
