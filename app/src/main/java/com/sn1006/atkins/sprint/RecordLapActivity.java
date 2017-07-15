@@ -3,14 +3,11 @@ package com.sn1006.atkins.sprint;
 import android.Manifest;
 import android.app.Activity;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
@@ -18,13 +15,11 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.NotificationCompat;
 import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -41,9 +36,7 @@ import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 
-import com.sn1006.atkins.sprint.data.SessionContract;
-import com.sn1006.atkins.sprint.data.SessionDbHelper;
-import com.sn1006.atkins.sprint.data.TrackData;
+import com.sn1006.atkins.sprint.data.TrackDataCSVHelper;
 import com.sn1006.atkins.sprint.sync.RecordLapTasks;
 import com.sn1006.atkins.sprint.sync.RecordingIntentService;
 
@@ -153,8 +146,9 @@ public class RecordLapActivity extends AppCompatActivity implements
         updateValuesFromBundle(savedInstanceState);
 
         //create Location object for start/stop point
-        mWaypoint.setLatitude(TrackData.getLat(track));
-        mWaypoint.setLongitude(TrackData.getLon(track));
+        TrackDataCSVHelper myCSV = new TrackDataCSVHelper();
+        mWaypoint.setLatitude(myCSV.getLat(track, this));
+        mWaypoint.setLongitude(myCSV.getLon(track, this));
 
         buildGoogleApiClient();
         createLocationRequest();
@@ -347,6 +341,8 @@ public class RecordLapActivity extends AppCompatActivity implements
     //Sets the UI values for the latitude and longitude
     protected void updateLocationUI() {
        if (mCurrentLocation != null) {
+           //TrackDataCSVHelper myCSV2 = new TrackDataCSVHelper();
+           //mDistanceFromWaypointText.setText(String.valueOf(myCSV2.getLon(track, this))); //<-- used this to test getting proper lat/lon
            //mDistanceFromWaypointText.setText(String.format("%s: %f", "Dist from WP", mDistanceFromWaypoint));
            //mZoneStatusText.setText("IN THE ZONE? " + mIsInZone);
            //mNumberUpdates.setText(String.valueOf(mNum));

@@ -6,11 +6,9 @@
         android:key="@string/pref_driver_key"
         android:title="@string/pref_driver_label" />
 
-    <ListPreference
-        android:defaultValue="@string/pref_track_wgi_value"
-        android:entries="@array/pref_track_option_labels"
-        android:entryValues="@array/pref_track_option_values"
+    <com.sn1006.atkins.sprint.preference.TrackDataPreference
         android:key="@string/pref_track_key"
-        android:title="@string/pref_track_label" />
+        android:title="@string/trackdatapreference"
+        android:summary="@string/trackdatapreference_summary" />
 
 </PreferenceScreen>
