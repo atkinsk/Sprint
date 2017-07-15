@@ -51,6 +51,11 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".SettingsActivity" />
         </activity>
+
+        <service
+            android:name=".sync.RecordingIntentService"
+            android:exported="false"/>
+
     </application>
 
 </manifest>

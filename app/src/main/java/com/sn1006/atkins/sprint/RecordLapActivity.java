@@ -3,14 +3,11 @@ package com.sn1006.atkins.sprint;
 import android.Manifest;
 import android.app.Activity;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
@@ -18,7 +15,6 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.NotificationCompat;
 import android.support.v7.preference.PreferenceManager;
@@ -40,9 +36,9 @@ import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 
-import com.sn1006.atkins.sprint.data.SessionContract;
-import com.sn1006.atkins.sprint.data.SessionDbHelper;
-import com.sn1006.atkins.sprint.data.TrackData;
+import com.sn1006.atkins.sprint.data.TrackDataCSVHelper;
+import com.sn1006.atkins.sprint.sync.RecordLapTasks;
+import com.sn1006.atkins.sprint.sync.RecordingIntentService;
 
 import android.support.v7.app.AppCompatActivity;
 
@@ -56,10 +52,10 @@ public class RecordLapActivity extends AppCompatActivity implements
 
     protected GoogleApiClient mGoogleApiClient;
     protected static final String TAG = "MainActivity";
+//sent to utilities
+    //protected SQLiteDatabase mDb;
 
-    protected SQLiteDatabase mDb;
-
-   protected TextView mDistanceFromWaypointText;
+    protected TextView mDistanceFromWaypointText;
     protected TextView mCurrentLapTimeText;
     protected TextView mPreviousLapTimeText;
     protected TextView mBestLapTimeText;
@@ -149,17 +145,19 @@ public class RecordLapActivity extends AppCompatActivity implements
         updateValuesFromBundle(savedInstanceState);
 
         //create Location object for start/stop point
-        mWaypoint.setLatitude(TrackData.getLat(track));
-        mWaypoint.setLongitude(TrackData.getLon(track));
+        TrackDataCSVHelper myCSV = new TrackDataCSVHelper();
+        mWaypoint.setLatitude(myCSV.getLat(track, this));
+        mWaypoint.setLongitude(myCSV.getLon(track, this));
 
+/*MOVED TO UTILITY
         SessionDbHelper dbHelper = new SessionDbHelper(this);
         mDb = dbHelper.getReadableDatabase();
+*/
 
         //implement continuously updating timer
         //human eye can register only as fast as every 30ms... so that's how often we will update
         //use an event handler to schedule the posting of the time at delayed intervals (30ms)
         //implement runnable interface to set the text
-
 
         buildGoogleApiClient();
         createLocationRequest();
@@ -215,6 +213,7 @@ public class RecordLapActivity extends AppCompatActivity implements
         setDriver(sharedPreferences);
         setTrack(sharedPreferences);
     }
+
 
     private void setDriver(SharedPreferences sharedPreferences) {
         driverName = sharedPreferences.getString(getString(R.string.pref_driver_key),
@@ -347,6 +346,8 @@ public class RecordLapActivity extends AppCompatActivity implements
     //Sets the UI values for the latitude and longitude
     protected void updateLocationUI() {
        if (mCurrentLocation != null) {
+           TrackDataCSVHelper myCSV2 = new TrackDataCSVHelper();
+           //mDistanceFromWaypointText.setText(String.valueOf(myCSV2.getLon(track, this))); //<-- used this to test getting proper lat/lon
            mDistanceFromWaypointText.setText(String.format("%s: %f", "Dist from WP", mDistanceFromWaypoint));
            //  mZoneStatusText.setText("IN THE ZONE? " + mIsInZone);
            mNumberUpdates.setText(String.valueOf(mNum));
@@ -672,6 +673,25 @@ public class RecordLapActivity extends AppCompatActivity implements
         }
     }
 
+    //creates a background task in which to add the session to the db
+    public void addNewSession() {
+        //Create an explicit intent for RecordingIntentService
+        Intent saveSessionIntent = new Intent(this, RecordingIntentService.class);
+        //Set the action of the intent to ACTION_SAVE_SESSION
+        saveSessionIntent.setAction(RecordLapTasks.ACTION_SAVE_SESSION);
+
+        //add the current session object info to the intent so it can be retrieved
+        saveSessionIntent.putExtra("session_driver", mySession.getDriver());
+        saveSessionIntent.putExtra("session_track", mySession.getTrackName());
+        saveSessionIntent.putExtra("session_bestLap", mySession.getBestLapString());
+        saveSessionIntent.putExtra("session_laptimes", mySession.getLaptimesAsString());
+        saveSessionIntent.putExtra("session_numLaps", mySession.getNumberOfLaps());
+
+        //Call startService and pass the explicit intent
+        startService(saveSessionIntent);
+    }
+
+/*MOVED TO SessionDbUtility
     //Adds session to the local SQL database
     private long addNewSession() {
         ContentValues cv = new ContentValues();
@@ -685,7 +705,7 @@ public class RecordLapActivity extends AppCompatActivity implements
         //insert query
         return mDb.insert(SessionContract.SessionEntry.TABLE_NAME, null, cv);
     }
-
+*/
     //Intent to return the user to the SessionlistActivity
     public void returnToSessionList() {
         Context context = this;
@@ -716,5 +736,24 @@ public class RecordLapActivity extends AppCompatActivity implements
     public void cancelRecordingNotification(){
         NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.cancel(mRecordingNotificationID);
+    }
+
+    /******************************************************************
+    TEST BUTTONS TO FAKE DATA FOR STARTING SESSION AND COMPLETING LAPS
+     ******************************************************************/
+    public void testStart(View view) {
+        //Toast.makeText(RecordLapActivity.this, "TESTING START BUTTON", Toast.LENGTH_LONG).show();
+        mIsInZone = true;
+        t.start();
+        handler.postDelayed(updater, 30);
+    }
+
+    public void testEndLap(View view) {
+        t.stop();
+        mySession.addLap(t.getLaptime());
+        mPreviousLapTimeText.setText(mySession.formatLaptime(mySession.getLastLapLong()));
+        mBestLapTimeText.setText(mySession.formatLaptime(mySession.getBestLapLong()));
+        t.start();
+        handler.postDelayed(updater, 30);
     }
 }
